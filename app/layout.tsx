@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Source_Sans_3 } from "next/font/google";
 import "./globals.css";
+import Navbar from "./components/Navbar";
 
-const inter = Inter({ subsets: ["latin"] });
+const source_sans_3 = Source_Sans_3({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  weight: ["400", "700"],
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,7 +21,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body
+        className={`${source_sans_3.className} max-w-screen-xl mx-auto min-h-svh`}
+      >
+        <Navbar></Navbar>
+        {children}
+      </body>
     </html>
   );
 }

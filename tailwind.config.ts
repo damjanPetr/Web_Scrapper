@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-
+import plugin from "tailwindcss/plugin";
 const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -15,6 +15,19 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function ({ addVariant, addComponents, addUtilities }) {
+      addComponents({});
+      addUtilities({
+        ".fcen": {
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        },
+      });
+      addVariant("group-open", [":merge(.group).open &"]);
+      addVariant("peer-open", [":merge(.peer).open &"]);
+    }),
+  ],
 };
 export default config;
