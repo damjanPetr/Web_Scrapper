@@ -10,4 +10,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
+model Node {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  selectors String
+  createdAt DateTime @default(now())
+}

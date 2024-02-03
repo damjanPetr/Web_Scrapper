@@ -1,10 +1,20 @@
-import Link from "next/link";
-import Navbar from "./components/Navbar";
+"use client";
 import { Metadata } from "next";
-
+import { TextNode } from "./lib/Database";
+/* 
 export const metadata: Metadata = {
   title: "Web Scrapper Homepage",
 };
+ */
+async function play() {
+  console.log("hahah");
+  const text = new TextNode("https://www.prisma.io/", ["h1"]);
+
+  const node = await text.scrap();
+
+  console.log(node);
+}
+
 function Home() {
   return (
     <div className="min-w-10 ">
@@ -13,10 +23,10 @@ function Home() {
         <article className="">
           {/* Blogs */}
           <section>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Soluta
-            dolor laudantium itaque mollitia vel ipsum iste vitae corrupti,
-            natus tempore a earum aliquid cupiditate officia quod reiciendis
-            neque repellendus veniam.
+            <form action={play}>
+              <p className="text-red-500 text-lg font-bold">monkey</p>
+              <button>play</button>
+            </form>
           </section>
         </article>
       </main>

@@ -5,6 +5,6 @@ export const metadata: Metadata = {
 };
 
 function About() {
-  return <div className="">npm i puppeteer</div>;
+  return <div className=""></div>;
 }
 export default About;
