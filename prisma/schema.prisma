@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Node {
+model Action {
   id        Int      @id @default(autoincrement())
   title     String
   content   String

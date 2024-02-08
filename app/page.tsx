@@ -1,19 +1,10 @@
 "use client";
 import { Metadata } from "next";
-import { TextNode } from "./lib/Database";
 /* 
 export const metadata: Metadata = {
   title: "Web Scrapper Homepage",
 };
  */
-async function play() {
-  console.log("hahah");
-  const text = new TextNode("https://www.prisma.io/", ["h1"]);
-
-  const node = await text.scrap();
-
-  console.log(node);
-}
 
 function Home() {
   return (
@@ -23,7 +14,7 @@ function Home() {
         <article className="">
           {/* Blogs */}
           <section>
-            <form action={play}>
+            <form>
               <p className="text-red-500 text-lg font-bold">monkey</p>
               <button>play</button>
             </form>
