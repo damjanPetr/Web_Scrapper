@@ -1,15 +1,20 @@
-import puppeteer, { Browser, Page } from "puppeteer";
+import puppeteer, { Page } from "puppeteer";
+import { State } from "./State";
 
-abstract class Action {
-  protected browser: Browser | null = null;
+export abstract class Action {
   protected uuid: number = Math.floor(Math.random() * 10000);
   protected name: string;
   abstract execute(): any | Promise<any>;
+  protected invoker: Invoker;
+  protected state: ReturnType<Invoker["getState"]>;
 
   constructor() {
     const className = this.constructor.name;
     this.name = className;
+    this.invoker = test;
+    this.state = this.invoker.getState();
   }
+
   toString() {
     return `${this.name} + UUID   ${this.uuid}`;
   }
@@ -20,8 +25,8 @@ class loadBrowserAction extends Action {
     super();
   }
   async execute() {
-    this.browser = await puppeteer.launch({
-      headless: "new",
+    this.state.browser = await puppeteer.launch({
+      headless: false,
     });
   }
 }
@@ -32,10 +37,10 @@ class openNewPageAction extends Action {
     this.url = url;
   }
   async execute() {
-    if (this.browser) {
-      const page = await this.browser.newPage();
+    if (this.state.browser) {
+      const page = await this.state.browser.newPage();
       await page.goto(this.url);
-      return page;
+      this.state.page = page;
     }
   }
 }
@@ -44,22 +49,14 @@ class closeBrowserAction extends Action {
     super();
   }
   execute(): void {
-    if (this.browser) {
-      this.browser.close();
+    if (this.state.browser) {
+      this.state.browser.close();
     }
   }
 }
 
-class navigatePageAction extends Action {
-  constructor() {
-    super();
-  }
-  async execute() {}
-}
-
 class waitForPageNavigationAction extends Action {
   private page: Page;
-
   constructor(page: Page) {
     super();
     this.page = page;
@@ -70,24 +67,31 @@ class waitForPageNavigationAction extends Action {
 }
 
 class waitForSelector extends Action {
-  private page: Page;
-  private selectors: string;
+  private selector: string;
 
-  constructor(page: Page, selectors: string) {
+  constructor(selector: string) {
     super();
-    this.page = page;
-    this.selectors = selectors;
+    this.selector = selector;
   }
   async execute() {
-    await this.page.waitForSelector(this.selectors);
+    if (this.state.page) {
+      const element = await this.state.page.waitForSelector(this.selector);
+      await element?.evaluate((e) => {
+        this.state.elements?.push(e);
+      });
+    }
   }
 }
 
 class Invoker {
   private onStart: Action | null = null;
   private onEnd: Action | null = null;
-  public actions: Action[] = [];
-  constructor() {}
+  private actions: Action[] = [];
+  protected state: State;
+
+  constructor() {
+    this.state = new State(null, null);
+  }
 
   setOnStart(action: Action) {
     this.onStart = action;
@@ -111,13 +115,40 @@ class Invoker {
   }
   listActions() {
     for (const action of this.actions) {
+      console.log(this.onStart?.toString());
       console.log(action.toString());
+      console.log(this.onEnd?.toString());
+    }
+  }
+  setState(state: State) {
+    this.state = state;
+  }
+  getState() {
+    return this.state.getState();
+  }
+}
+
+class getElementText extends Action {
+  constructor() {
+    super();
+  }
+  async execute() {
+    if (this.state.elements && this.state.elements.length > 0) {
+      const element = this.state.elements[0];
+      const text = element.textContent;
+      console.log(text);
     }
   }
 }
 const test = new Invoker();
+
+const hashmap: { [key: string]: Action } = {};
+
 test.setOnStart(new loadBrowserAction());
 test.setOnEnd(new closeBrowserAction());
 
-const page = new openNewPageAction("https://www.google.com");
-test.addAction(new waitForSelector(page, "#search"));
+test.addAction(new openNewPageAction("http://google.com"));
+test.addAction(new waitForSelector("p"));
+test.addAction(new getElementText());
+// test.activate();
+console.log(test.listActions());
