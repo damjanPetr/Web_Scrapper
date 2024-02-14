@@ -19,7 +19,7 @@ export class Invoker {
   private onStart: Action | null = null;
   private onEnd: Action | null = null;
   private actions: { action: mapActions; parameters: string[] }[] = [];
-  protected state: State;
+  public state: State;
 
   private hashmap: {
     [K in mapActions]: new (...arg: any) => Action;

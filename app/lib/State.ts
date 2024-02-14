@@ -6,7 +6,7 @@ export class State {
   public action: string | null = null;
   public browser: Browser | null = null;
   public elements: ElementHandle[] | null = null;
-  public result: [] = [];
+  public result: any[] = [];
   public extractParams:
     | {
         name: string;

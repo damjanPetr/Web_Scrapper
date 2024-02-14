@@ -19,7 +19,7 @@ export abstract class Action {
     const className = this.constructor.name;
     this.name = className;
     this.invoker = test;
-    this.state = this.invoker.getState();
+    this.state = this.invoker.state;
     this.state.action = this.name;
   }
 
@@ -34,7 +34,7 @@ export class loadBrowserAction extends Action {
   }
   async execute() {
     this.state.browser = await puppeteer.launch({
-      headless: false,
+      headless: "new",
     });
   }
 }
@@ -180,35 +180,37 @@ export class evaluateElements extends Action {
     const elementArray = this.state.elements;
     const params = this.state.extractParams;
 
-    console.log("🚀 ✔ evaluateElements ✔ execute ✔ params:", params);
-
     if (elementArray)
       for (let element of elementArray) {
-        if (params)
-          params.forEach(async ({ name, selector, type }) => {
-            // console.count("paramsCounts");
-            const value = await page?.evaluate(
-              (innerElement: any, type, selector) => {
-                if (selector === "") {
-                  console.log(innerElement[type]);
-                  return innerElement[type];
-                } else {
-                  const ele = innerElement.querySelector(selector);
-                  return ele[type];
-                }
-              },
-              element,
-              type,
-              selector
-            );
-            this.state.result.push(value);
+        if (params) {
+          const temp: { [key: string]: string } = {};
+          await new Promise((resolve, reject) => {
+            params.forEach(async ({ name, selector, type }) => {
+              // console.count("paramsCounts");
+              const value = await page?.evaluate(
+                (innerElement: any, type, selector) => {
+                  if (selector === "") {
+                    console.log(innerElement[type]);
+                    return innerElement[type];
+                  } else {
+                    const ele = innerElement.querySelector(selector);
+                    return ele[type];
+                  }
+                },
+                element,
+                type,
+                selector
+              );
+              // console.log(name, "::::", value);
+              temp[name] = value;
+              resolve(value);
+            });
           });
+          this.state.result.push(temp);
+        }
       }
-    // await writeFileSync(
-    //   "./result.txt",
-    //   JSON.stringify(this.state.result) + "\n"
-    // );
-    console.log(this.state.result);
+
+    writeFileSync("./result.txt", this.state.result + "\r");
   }
 }
 type AllHTMLElementProperties = {
