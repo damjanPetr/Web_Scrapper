@@ -3,7 +3,8 @@ import { State } from "./State";
 // import StealthPluggin from "puppeteer-extra-plugin-stealth";
 // import puppeteer from "puppeteer-extra";
 import puppeteer from "puppeteer";
-import { mapActions } from "../types";
+import { Invoker } from "./Invoker";
+import { writeFile, writeFileSync } from "fs";
 
 // puppeteer.use(StealthPluggin());
 
@@ -18,8 +19,8 @@ export abstract class Action {
     const className = this.constructor.name;
     this.name = className;
     this.invoker = test;
-
     this.state = this.invoker.getState();
+    this.state.action = this.name;
   }
 
   toString() {
@@ -27,7 +28,7 @@ export abstract class Action {
   }
 }
 
-class loadBrowserAction extends Action {
+export class loadBrowserAction extends Action {
   constructor() {
     super();
   }
@@ -35,10 +36,9 @@ class loadBrowserAction extends Action {
     this.state.browser = await puppeteer.launch({
       headless: false,
     });
-    console.log("🚀 ✔ loadBrowserAction ✔ execute ✔ browser:", this.state);
   }
 }
-class openNewPageAction extends Action {
+export class openNewPageAction extends Action {
   public url: string;
   constructor(url: string) {
     super();
@@ -47,21 +47,24 @@ class openNewPageAction extends Action {
   async execute() {
     if (this.state.browser) {
       const page = await this.state.browser.newPage();
-      await page.goto(this.url);
+      await page.goto(this.url, {
+        waitUntil: "domcontentloaded",
+      });
       this.state.page = page;
     }
   }
 }
-class closeBrowserAction extends Action {
+
+export class closeBrowserAction extends Action {
   constructor() {
     super();
   }
-  execute(): void {
+  async execute() {
     if (this.state.browser) this.state.browser?.close();
   }
 }
 
-class waitForPageNavigationAction extends Action {
+export class waitForPageNavigationAction extends Action {
   private page: Page;
   constructor(page: Page) {
     super();
@@ -88,7 +91,39 @@ class waitForSelectorElements extends Action {
     }
   }
 }
-class waitForSelector extends Action {
+
+export class page$ extends Action {
+  private selector: string;
+
+  constructor(selector: string, filter: string) {
+    super();
+    this.selector = selector;
+  }
+  async execute() {
+    if (this.state.page) {
+      const element = await this.state.page.waitForSelector(this.selector);
+      await element?.evaluate((e: any) => {
+        this.state.elements?.push(e);
+      });
+    }
+  }
+}
+export class page$$ extends Action {
+  private selector: string;
+
+  constructor(selector: string, filter: string) {
+    super();
+    this.selector = selector;
+  }
+  async execute() {
+    if (this.state.page) {
+      const elements = await this.state.page.$$(this.selector);
+      this.state.elements = elements;
+      debugger;
+    }
+  }
+}
+export class waitForSelector extends Action {
   private selector: string;
 
   constructor(selector: string) {
@@ -98,91 +133,115 @@ class waitForSelector extends Action {
   async execute() {
     if (this.state.page) {
       const element = await this.state.page.waitForSelector(this.selector);
-      await element?.evaluate((e) => {
-        this.state.elements?.push(e);
-      });
+      if (element) this.state.elements?.push(element);
     }
   }
 }
 
-class Invoker {
-  private onStart: Action | null = null;
-  private onEnd: Action | null = null;
-  private actions: { action: mapActions; parameters: string }[] = [];
-  protected state: State;
-
-  private hashmap: {
-    [K in mapActions]: new (...arg: any) => Action;
-  } = {
-    loadBrowser: loadBrowserAction,
-    closeBrowser: closeBrowserAction,
-    waitPageNavigation: waitForPageNavigationAction,
-    waitSelector: waitForSelector,
-  };
-
-  constructor() {
-    this.state = new State();
-  }
-
-  setOnStart(action: Action) {
-    this.onStart = action;
-  }
-  setOnEnd(action: Action) {
-    this.onEnd = action;
-  }
-  addAction(action: mapActions, params: string) {
-    this.actions.push({
-      action: action,
-      parameters: params,
-    });
-  }
-  async activate() {
-    await this.onStart?.execute();
-    for (const { action, parameters } of this.actions) {
-      console.log(action, parameters);
-      try {
-        const actionClass = await new this.hashmap[action](...parameters);
-        actionClass.execute();
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    await this.onEnd?.execute();
-  }
-  listActions() {
-    for (const action of this.actions) {
-      return action.toString();
-    }
-    if (this.actions.length >= 0) {
-      return "there are currently no actions loaded";
-    }
-  }
-  setState(state: State) {}
-  getState() {
-    return this.state;
-  }
-}
-
-class getElementText extends Action {
+export class typeAction extends Action {
   constructor() {
     super();
   }
   async execute() {
     if (this.state.elements && this.state.elements.length > 0) {
-      const element = this.state.elements[0];
-      const text = element.textContent;
-      console.log(text);
+      this.state.elements.forEach((element) => {
+        element.type("test");
+      });
     }
   }
 }
+export class addExtractTypeAction extends Action {
+  constructor(
+    public selector: string = "",
+    public name: string,
+    public type: "textContent" | "href"
+  ) {
+    super();
+  }
+
+  async execute() {
+    if (this.state) {
+      this.state.extractParams?.push({
+        name: this.name,
+        selector: this.selector,
+        type: this.type,
+      });
+    }
+  }
+}
+
+export class evaluateElements extends Action {
+  constructor() {
+    super();
+  }
+  async execute() {
+    const document: { [key: string]: string } = {};
+    const page = this.state.page;
+    const elementArray = this.state.elements;
+    const params = this.state.extractParams;
+
+    console.log("🚀 ✔ evaluateElements ✔ execute ✔ params:", params);
+
+    if (elementArray)
+      for (let element of elementArray) {
+        if (params)
+          params.forEach(async ({ name, selector, type }) => {
+            // console.count("paramsCounts");
+            const value = await page?.evaluate(
+              (innerElement: any, type, selector) => {
+                if (selector === "") {
+                  console.log(innerElement[type]);
+                  return innerElement[type];
+                } else {
+                  const ele = innerElement.querySelector(selector);
+                  return ele[type];
+                }
+              },
+              element,
+              type,
+              selector
+            );
+            this.state.result.push(value);
+          });
+      }
+    // await writeFileSync(
+    //   "./result.txt",
+    //   JSON.stringify(this.state.result) + "\n"
+    // );
+    console.log(this.state.result);
+  }
+}
+type AllHTMLElementProperties = {
+  [K in keyof HTMLElementTagNameMap]: HTMLElementTagNameMap[K];
+};
+export class printResultAction extends Action {
+  constructor() {
+    super();
+  }
+  async execute() {
+    console.log(this.state.result);
+  }
+}
+
 const test = new Invoker();
 
 test.setOnStart(new loadBrowserAction());
-test.setOnEnd(new closeBrowserAction());
-test.addAction("waitPageNavigation", '["https://www.google.com"]');
-test.addAction(
-  "waitSelector",
-  `"#gb > div > div:nth-child(1) > div > div:nth-child(1) > a"`
-);
+// test.setOnEnd(new closeBrowserAction());
+
+test.addAction("openNewPage", "https://docs.astro.build/en/getting-started/");
+// test.addAction("addExtractType", "", "class", "className");
+test.addAction("addExtractType", "", "link", "href");
+test.addAction("page$$", "a");
+test.addAction("evaluateElements");
 test.activate();
-console.log(test.listActions());
+
+export function toResult(
+  element: any,
+  innerSelector: string,
+  extractType: "textContent" | "href"
+) {
+  const e = element.querySelector(`${innerSelector}`);
+  if (e) {
+    return e[extractType];
+  }
+}
