@@ -10,6 +10,7 @@ import { Action } from "./lib/Action";
 export type mapActions =
   | "loadBrowser"
   | "page$"
+  | "addTitle"
   | "page$$"
   | "printResult"
   | "closeBrowser"

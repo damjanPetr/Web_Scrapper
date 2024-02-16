@@ -2,6 +2,7 @@ import { mapActions } from "../types";
 import {
   Action,
   addExtractTypeAction,
+  addTitleAction,
   closeBrowserAction,
   evaluateElements,
   loadBrowserAction,
@@ -25,6 +26,7 @@ export class Invoker {
     [K in mapActions]: new (...arg: any) => Action;
   } = {
     evaluateElements: evaluateElements,
+    addTitle: addTitleAction,
     page$: page$,
     page$$: page$$,
     addExtractType: addExtractTypeAction,

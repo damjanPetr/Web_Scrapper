@@ -11,9 +11,40 @@ datasource db {
 }
 
 model Action {
+  id            Int             @id @default(autoincrement())
+  title         String          @unique
+  createdAt     DateTime        @default(now())
+  parameters    Parameter[]
+  scrap_actions scrap_actions[]
+}
+
+model Parameter {
+  id              Int    @id @default(autoincrement())
+  key             String @unique
+  value           String
+  actionId        Int
+  scrap_actionsId Int?
+
+  Action        Action         @relation(fields: [actionId], references: [id])
+  scrap_actions scrap_actions? @relation(fields: [scrap_actionsId], references: [id])
+}
+
+model Scrap_Instance {
   id        Int      @id @default(autoincrement())
+  url       String
   title     String
-  content   String
-  selectors String
   createdAt DateTime @default(now())
+
+  scrap_actions scrap_actions[]
+}
+
+model scrap_actions {
+  id               Int      @id @default(autoincrement())
+  createdAt        DateTime @default(now())
+  scrap_InstanceId Int
+  actionId         Int
+
+  parameters Parameter[]
+  action     Action         @relation(fields: [actionId], references: [id])
+  instance   Scrap_Instance @relation(fields: [scrap_InstanceId], references: [id])
 }

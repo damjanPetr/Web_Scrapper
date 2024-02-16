@@ -4,7 +4,9 @@ import { State } from "./State";
 // import puppeteer from "puppeteer-extra";
 import puppeteer from "puppeteer";
 import { Invoker } from "./Invoker";
-import { writeFile, writeFileSync } from "fs";
+import { openSync, writeFile, writeFileSync } from "fs";
+import db from "../database/Database";
+import { stringify } from "csv";
 
 // puppeteer.use(StealthPluggin());
 
@@ -25,6 +27,19 @@ export abstract class Action {
 
   toString() {
     return `${this.name} + UUID   ${this.uuid}`;
+  }
+  addToDatabase(arg: any) {
+    db.action;
+  }
+}
+export class addTitleAction extends Action {
+  public title: string;
+  constructor(title: string) {
+    super();
+    this.title = title;
+  }
+  async execute() {
+    this.state.info.title = this.title;
   }
 }
 
@@ -51,6 +66,7 @@ export class openNewPageAction extends Action {
         waitUntil: "domcontentloaded",
       });
       this.state.page = page;
+      this.state.info.title = this.url;
     }
   }
 }
@@ -206,13 +222,27 @@ export class evaluateElements extends Action {
               resolve(value);
             });
           });
+
           this.state.result.push(temp);
         }
       }
-
-    writeFileSync("./result.txt", this.state.result + "\r");
   }
 }
+
+export class writeToCsv extends Action {
+  constructor() {
+    super();
+  }
+  execute() {
+    // writeFileSync("./result.csv", JSON.stringify(this.state.result) + "\r", {
+    //   flag: "a",
+    // });
+
+    // const data = this.state.result.map((obj) => {});
+    console.log(this.state.result);
+  }
+}
+
 type AllHTMLElementProperties = {
   [K in keyof HTMLElementTagNameMap]: HTMLElementTagNameMap[K];
 };
@@ -222,19 +252,39 @@ export class printResultAction extends Action {
   }
   async execute() {
     console.log(this.state.result);
+    const info = {
+      title: this.state.info.title,
+      link: this.state.info.link,
+    };
+
+    stringify(
+      this.state.result,
+      { header: true, columns: ["title", "link"] },
+      (err, csv) => {
+        if (err) throw err;
+
+        writeFileSync("./result.csv", info + "\r", { flag: "a" });
+        writeFileSync("./result.csv", csv + "\r", { flag: "a" });
+      }
+    );
   }
 }
-
 const test = new Invoker();
 
 test.setOnStart(new loadBrowserAction());
-// test.setOnEnd(new closeBrowserAction());
+test.setOnEnd(new closeBrowserAction());
 
-test.addAction("openNewPage", "https://docs.astro.build/en/getting-started/");
+test.addAction("addTitle", "string");
+
+test.addAction(
+  "openNewPage",
+  "https://haberdashpi.github.io/vscode-selection-utilities/stable/edit_text.html"
+);
 // test.addAction("addExtractType", "", "class", "className");
 test.addAction("addExtractType", "", "link", "href");
 test.addAction("page$$", "a");
 test.addAction("evaluateElements");
+test.addAction("printResult");
 test.activate();
 
 export function toResult(
@@ -246,4 +296,9 @@ export function toResult(
   if (e) {
     return e[extractType];
   }
+}
+
+interface addToDatabase {
+  name: string;
+  url: string;
 }

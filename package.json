@@ -9,8 +9,12 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
     "@prisma/client": "^5.9.1",
+    "csv": "^6.3.6",
     "next": "14.1.0",
     "puppeteer": "^21.10.0",
     "puppeteer-extra": "^3.3.6",

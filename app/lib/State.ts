@@ -3,6 +3,11 @@ import { Action, toResult } from "./Action";
 
 export class State {
   public page: Page | null = null;
+  public info = {
+    title: "",
+    link: "",
+  };
+
   public action: string | null = null;
   public browser: Browser | null = null;
   public elements: ElementHandle[] | null = null;
