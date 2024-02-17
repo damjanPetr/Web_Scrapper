@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 const source_sans_3 = Source_Sans_3({
   subsets: ["latin"],
   style: ["normal", "italic"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -21,11 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${source_sans_3.className} max-w-screen-xl mx-auto min-h-svh`}
-      >
-        <Navbar></Navbar>
-        {children}
+      <body className={`${source_sans_3.className}`}>
+        <Navbar />
+        <main className="max-w-screen-xl mx-auto min-h-svh ">{children}</main>
       </body>
     </html>
   );
