@@ -1,5 +1,4 @@
 import { Browser, ElementHandle, Page } from "puppeteer";
-import { Action } from "./Action";
 import { toResult } from "./misc/helpers";
 
 export class State {

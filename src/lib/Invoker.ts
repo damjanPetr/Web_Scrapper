@@ -1,3 +1,4 @@
+import { PrismaClient } from "@prisma/client/extension";
 import db from "../database/Database";
 import { mapActions } from "../types";
 import {
@@ -89,26 +90,35 @@ export class Invoker implements addToDatabase {
   }
   async addToDatabase(): Promise<void> {
     try {
-      const actions = this.actions.map((action) => {
-        return {
-          action: action.action,
-          parameters: action.parameters,
-        };
+      const actions = this.actions;
+      const instance = await db.scrap_Instance.create({
+        data: {
+          title: this.state.info.title,
+          url: this.state.info.link,
+        },
+      });
+      actions.forEach(async ({ action, parameters }) => {
+        const actionReturn = await db.action.create({
+          data: {
+            action: action,
+            scrap_InstanceId: instance.id,
+          },
+        });
+
+        parameters.forEach(async (param, index) => {
+          if (param === "") return;
+          await db.parameter.create({
+            data: {
+              position: index,
+              value: param,
+              actionId: actionReturn.id,
+            },
+          });
+        });
+        console.log(parameters);
       });
 
-      console.log(actions);
-      console.log(this.state.info.link, "1");
-      console.log(this.state.info.title, "2");
-      // await db.scrap_Instance.create({
-      //   data: {
-      //     title: this.state.info.title,
-      //     url: this.state.info.link,
-      //     // scrap_actions: this.actions as {
-      //     //   action: string;
-      //     //   parameters: string[];
-      //     // }[],
-      //   },
-      // });
+      console.log("added to database");
     } catch (err) {
       throw new Error();
     }

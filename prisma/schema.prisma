@@ -10,23 +10,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Action {
-  id            Int             @id @default(autoincrement())
-  title         String          @unique
-  createdAt     DateTime        @default(now())
-  parameters    Parameter[]
-  scrap_actions scrap_actions[]
-}
-
 model Parameter {
-  id              Int    @id @default(autoincrement())
-  key             String @unique
-  value           String
-  actionId        Int
-  scrap_actionsId Int?
+  id       Int    @id @default(autoincrement())
+  value    String
+  actionId Int
+  position Int
 
-  Action        Action         @relation(fields: [actionId], references: [id])
-  scrap_actions scrap_actions? @relation(fields: [scrap_actionsId], references: [id])
+  actions Action? @relation(fields: [actionId], references: [id])
 }
 
 model Scrap_Instance {
@@ -35,16 +25,15 @@ model Scrap_Instance {
   title     String
   createdAt DateTime @default(now())
 
-  scrap_actions scrap_actions[]
+  actions Action[]
 }
 
-model scrap_actions {
+model Action {
   id               Int      @id @default(autoincrement())
   createdAt        DateTime @default(now())
+  action           String
   scrap_InstanceId Int
-  actionId         Int
 
   parameters     Parameter[]
-  action         Action         @relation(fields: [actionId], references: [id])
   scrap_instance Scrap_Instance @relation(fields: [scrap_InstanceId], references: [id])
 }

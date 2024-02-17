@@ -13,17 +13,17 @@ import { stringify } from "csv";
 export abstract class Action {
   protected uuid: number = Math.floor(Math.random() * 10000);
   protected name: string;
-  abstract execute(): any | Promise<any>;
   protected invoker: Invoker;
   protected state: State;
 
   constructor() {
-    const className = this.constructor.name;
-    this.name = className;
+    this.name = this.constructor.name;
     this.invoker = test;
     this.state = this.invoker.state;
     this.state.action = this.name;
   }
+
+  abstract execute(): any | Promise<any>;
 
   toString() {
     return `${this.name} + UUID   ${this.uuid}`;
@@ -280,4 +280,6 @@ const test = new Invoker();
   test.addAction("page$$", "a");
   test.addAction("evaluateElements");
   test.addAction("printResult");
+  await test.activate();
+  test.addToDatabase();
 })();
