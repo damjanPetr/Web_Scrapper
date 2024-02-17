@@ -1,3 +1,4 @@
+import db from "../database/Database";
 import { mapActions } from "../types";
 import {
   Action,
@@ -16,7 +17,11 @@ import {
 } from "./Action";
 import { State } from "./State";
 
-export class Invoker {
+interface addToDatabase {
+  addToDatabase(): void;
+}
+
+export class Invoker implements addToDatabase {
   private onStart: Action | null = null;
   private onEnd: Action | null = null;
   private actions: { action: mapActions; parameters: string[] }[] = [];
@@ -65,7 +70,7 @@ export class Invoker {
         const actionClass = new this.hashmap[action](...parameters);
         await actionClass.execute();
       } catch (err) {
-        if (err instanceof Error) console.log(err.message);
+        if (err instanceof Error) console.log(err.name);
       }
     }
     await this.onEnd?.execute();
@@ -81,5 +86,31 @@ export class Invoker {
   setState(state: State) {}
   getState() {
     return this.state;
+  }
+  async addToDatabase(): Promise<void> {
+    try {
+      const actions = this.actions.map((action) => {
+        return {
+          action: action.action,
+          parameters: action.parameters,
+        };
+      });
+
+      console.log(actions);
+      console.log(this.state.info.link, "1");
+      console.log(this.state.info.title, "2");
+      // await db.scrap_Instance.create({
+      //   data: {
+      //     title: this.state.info.title,
+      //     url: this.state.info.link,
+      //     // scrap_actions: this.actions as {
+      //     //   action: string;
+      //     //   parameters: string[];
+      //     // }[],
+      //   },
+      // });
+    } catch (err) {
+      throw new Error();
+    }
   }
 }

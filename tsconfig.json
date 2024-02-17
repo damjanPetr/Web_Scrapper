@@ -1,6 +1,8 @@
 {
   "ts-node": {
-    "esm": true
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
   },
 
   "compilerOptions": {

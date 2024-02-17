@@ -44,7 +44,7 @@ model scrap_actions {
   scrap_InstanceId Int
   actionId         Int
 
-  parameters Parameter[]
-  action     Action         @relation(fields: [actionId], references: [id])
-  instance   Scrap_Instance @relation(fields: [scrap_InstanceId], references: [id])
+  parameters     Parameter[]
+  action         Action         @relation(fields: [actionId], references: [id])
+  scrap_instance Scrap_Instance @relation(fields: [scrap_InstanceId], references: [id])
 }

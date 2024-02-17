@@ -66,7 +66,7 @@ export class openNewPageAction extends Action {
         waitUntil: "domcontentloaded",
       });
       this.state.page = page;
-      this.state.info.title = this.url;
+      this.state.info.link = this.url;
     }
   }
 }
@@ -135,7 +135,6 @@ export class page$$ extends Action {
     if (this.state.page) {
       const elements = await this.state.page.$$(this.selector);
       this.state.elements = elements;
-      debugger;
     }
   }
 }
@@ -252,17 +251,13 @@ export class printResultAction extends Action {
   }
   async execute() {
     console.log(this.state.result);
-    const info = {
-      title: this.state.info.title,
-      link: this.state.info.link,
-    };
+    const info = [this.state.info.title, this.state.info.link];
 
     stringify(
       this.state.result,
       { header: true, columns: ["title", "link"] },
       (err, csv) => {
         if (err) throw err;
-
         writeFileSync("./result.csv", info + "\r", { flag: "a" });
         writeFileSync("./result.csv", csv + "\r", { flag: "a" });
       }
@@ -271,34 +266,18 @@ export class printResultAction extends Action {
 }
 const test = new Invoker();
 
-test.setOnStart(new loadBrowserAction());
-test.setOnEnd(new closeBrowserAction());
+(async () => {
+  test.setOnStart(new loadBrowserAction());
+  test.setOnEnd(new closeBrowserAction());
+  test.addAction("addTitle", "string");
+  test.addAction(
+    "openNewPage",
+    "https://haberdashpi.github.io/vscode-selection-utilities/stable/edit_text.html"
+  );
 
-test.addAction("addTitle", "string");
-
-test.addAction(
-  "openNewPage",
-  "https://haberdashpi.github.io/vscode-selection-utilities/stable/edit_text.html"
-);
-// test.addAction("addExtractType", "", "class", "className");
-test.addAction("addExtractType", "", "link", "href");
-test.addAction("page$$", "a");
-test.addAction("evaluateElements");
-test.addAction("printResult");
-test.activate();
-
-export function toResult(
-  element: any,
-  innerSelector: string,
-  extractType: "textContent" | "href"
-) {
-  const e = element.querySelector(`${innerSelector}`);
-  if (e) {
-    return e[extractType];
-  }
-}
-
-interface addToDatabase {
-  name: string;
-  url: string;
-}
+  test.addAction("addExtractType", "", "link", "href");
+  test.addAction("addTitle", "test1");
+  test.addAction("page$$", "a");
+  test.addAction("evaluateElements");
+  test.addAction("printResult");
+})();
