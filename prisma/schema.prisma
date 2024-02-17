@@ -10,10 +10,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Node {
+model Parameter {
+  id       Int    @id @default(autoincrement())
+  value    String
+  actionId Int
+  position Int
+
+  actions Action? @relation(fields: [actionId], references: [id])
+}
+
+model Scrap_Instance {
   id        Int      @id @default(autoincrement())
+  url       String
   title     String
-  content   String
-  selectors String
   createdAt DateTime @default(now())
+
+  actions Action[]
+}
+
+model Action {
+  id               Int      @id @default(autoincrement())
+  createdAt        DateTime @default(now())
+  action           String
+  scrap_InstanceId Int
+
+  parameters     Parameter[]
+  scrap_instance Scrap_Instance @relation(fields: [scrap_InstanceId], references: [id])
 }
