@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client/extension";
 import db from "../database/Database";
-import { mapActions } from "../types";
+import { mapActions } from "./misc/types";
 import {
   Action,
   addExtractTypeAction,

@@ -1,5 +1,3 @@
-import { Action } from "./lib/Action";
-
 // export type mapActions = {
 //   loadBrowser: string;
 //   closeBrowser: string;
