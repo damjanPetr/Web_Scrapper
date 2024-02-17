@@ -169,7 +169,7 @@ export class addExtractTypeAction extends Action {
   constructor(
     public selector: string = "",
     public name: string,
-    public type: "textContent" | "href"
+    public type: "textContent" | "href",
   ) {
     super();
   }
@@ -214,7 +214,7 @@ export class evaluateElements extends Action {
                 },
                 element,
                 type,
-                selector
+                selector,
               );
               // console.log(name, "::::", value);
               temp[name] = value;
@@ -260,7 +260,7 @@ export class printResultAction extends Action {
         if (err) throw err;
         writeFileSync("./result.csv", info + "\r", { flag: "a" });
         writeFileSync("./result.csv", csv + "\r", { flag: "a" });
-      }
+      },
     );
   }
 }
@@ -272,7 +272,7 @@ const test = new Invoker();
   test.addAction("addTitle", "string");
   test.addAction(
     "openNewPage",
-    "https://haberdashpi.github.io/vscode-selection-utilities/stable/edit_text.html"
+    "https://haberdashpi.github.io/vscode-selection-utilities/stable/edit_text.html",
   );
 
   test.addAction("addExtractType", "", "link", "href");
