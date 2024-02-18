@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import db from "../database/Database";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Web Scrapper Homepage",
@@ -16,21 +17,21 @@ async function Home() {
       _count: true,
     },
   });
-  const map: { [key: string]: (typeof instance)[0] } = {};
 
-  instance.forEach((item) => {
-    map[item.title] === undefined ? (map[item.title] = item) : "";
-  });
-  console.log(map);
+  // const map: { [key: string]: (typeof instance)[0] } = {};
+  // instance.forEach((item) => {
+  //   map[item.title] === undefined ? (map[item.title] = item) : "";
+  // });
+  // console.log(instance);
 
   return (
-    <div className=" ">
+    <div className="">
       <div className="">
         <article className="">
-          <section className="">
+          <section className="space-y-4">
             {instance.map((e) => {
               return (
-                <div key={e.id} className="p-4 bg-blue-50 w-full ">
+                <div key={e.id} className="w-full rounded-lg bg-blue-50 p-4 ">
                   <div className="space-y-4 p-4">
                     <h1 className="text-2xl">
                       <span className="font-semibold">Title:</span> {e.title}
@@ -40,7 +41,7 @@ async function Home() {
                     </h1>
                   </div>
                   <div className="bg-red-200">
-                    <h2 className="text-gray-700  text-xl font-bold p-2 bg-fuchsia-300 ">
+                    <h2 className="bg-fuchsia-300  p-2 text-xl font-bold text-gray-700 ">
                       Actions
                     </h2>
                     <div className="">
@@ -49,7 +50,7 @@ async function Home() {
                           <div key={action.id} className="grid grid-cols-2">
                             <p>{action.action}</p>
                             <div className="basis-1/2">
-                              <h3 className="text-lg bg-gray-50 font-bold">
+                              <h3 className="bg-gray-50 text-lg font-bold">
                                 Parameters
                               </h3>
                               <div className="flex items-center gap-4  p-4">
@@ -67,7 +68,7 @@ async function Home() {
                       })}
                     </div>
                   </div>
-                  <h2 className="  text-xl font-bold p-2 bg-fuchsia-700 text-white ">
+                  <h2 className="  bg-fuchsia-700 p-2 text-xl font-bold text-white ">
                     Results
                   </h2>
                 </div>
@@ -79,4 +80,5 @@ async function Home() {
     </div>
   );
 }
+
 export default Home;

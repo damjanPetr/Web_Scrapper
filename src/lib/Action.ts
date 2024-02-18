@@ -2,11 +2,11 @@ import { Page } from "puppeteer";
 import { State } from "./State";
 // import StealthPluggin from "puppeteer-extra-plugin-stealth";
 // import puppeteer from "puppeteer-extra";
-import puppeteer from "puppeteer";
-import { Invoker } from "./Invoker";
-import { openSync, writeFile, writeFileSync } from "fs";
-import db from "../database/Database";
 import { stringify } from "csv";
+import { writeFileSync } from "fs";
+import puppeteer from "puppeteer";
+import db from "../database/Database";
+import { Invoker } from "./Invoker";
 
 // puppeteer.use(StealthPluggin());
 
@@ -14,13 +14,11 @@ export abstract class Action {
   protected uuid: number = Math.floor(Math.random() * 10000);
   protected name: string;
   protected invoker: Invoker;
-  protected state: State;
+  protected state: State | null;
 
   constructor() {
     this.name = this.constructor.name;
-    this.invoker = test;
-    this.state = this.invoker.state;
-    this.state.action = this.name;
+    this.invoker = null!!;
   }
 
   abstract execute(): any | Promise<any>;
@@ -30,6 +28,12 @@ export abstract class Action {
   }
   addToDatabase(arg: any) {
     db.action;
+  }
+  setInvoker(invoker: Invoker) {
+    this.invoker = invoker;
+    this.state = invoker.state;
+    this.state = this.invoker.state;
+    this.state.action = this.name;
   }
 }
 export class addTitleAction extends Action {
@@ -264,22 +268,5 @@ export class printResultAction extends Action {
     );
   }
 }
-const test = new Invoker();
 
-(async () => {
-  test.setOnStart(new loadBrowserAction());
-  test.setOnEnd(new closeBrowserAction());
-  test.addAction("addTitle", "string");
-  test.addAction(
-    "openNewPage",
-    "https://haberdashpi.github.io/vscode-selection-utilities/stable/edit_text.html",
-  );
-
-  test.addAction("addExtractType", "", "link", "href");
-  test.addAction("addTitle", "test1");
-  test.addAction("page$$", "a");
-  test.addAction("evaluateElements");
-  test.addAction("printResult");
-  await test.activate();
-  test.addToDatabase();
-})();
+// const test = new Invoker();

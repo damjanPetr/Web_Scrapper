@@ -14,13 +14,7 @@ function Navbar({ children }: Props) {
       <nav className="">
         <ul className="flex gap-10 text-xl">
           <li>
-            <Link href={"/about"}>About</Link>
-          </li>
-          <li>
-            <Link href={"/about"}>About</Link>
-          </li>
-          <li>
-            <Link href={"/about"}>About</Link>
+            <Link href={"/add"}>add</Link>
           </li>
           <li>
             <Link href={"/about"}>About</Link>
