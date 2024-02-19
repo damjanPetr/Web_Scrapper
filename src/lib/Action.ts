@@ -254,7 +254,7 @@ export class printResultAction extends Action {
     super();
   }
   async execute() {
-    console.log(this.state.result);
+    // console.log(this.state.result);
     const info = [this.state.info.title, this.state.info.link];
 
     stringify(

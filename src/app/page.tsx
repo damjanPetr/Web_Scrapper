@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import db from "../database/Database";
-import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Web Scrapper Homepage",

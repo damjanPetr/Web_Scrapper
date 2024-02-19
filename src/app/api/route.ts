@@ -1,25 +1,31 @@
 import { closeBrowserAction, loadBrowserAction } from "@/src/lib/Action";
 import { Invoker } from "@/src/lib/Invoker";
+import { NextRequest } from "next/server";
 
-export async function GET(request: Request) {
+export async function POST(request: NextRequest) {
+  const { link, title, selector, selectorName } = await request.json();
+
   const test = new Invoker();
 
   test.setOnStart(new loadBrowserAction());
   test.setOnEnd(new closeBrowserAction());
-  test.addAction("addTitle", "string");
-  test.addAction(
-    "openNewPage",
-    "https://haberdashpi.github.io/vscode-selection-utilities/stable/edit_text.html",
-  );
+  test.addAction("addTitle", title);
+  test.addAction("openNewPage", link);
 
-  test.addAction("addExtractType", "", "link", "href");
+  test.addAction("addExtractType", "", selectorName, "href");
   test.addAction("addTitle", "test1");
   test.addAction("page$$", "a");
   test.addAction("evaluateElements");
   test.addAction("printResult");
   await test.activate();
 
-  const play = test.state.info.title;
+  console.log(test.state.result);
+  const resData = {
+    title: link,
+    link: title,
+    result: test.state.result,
+  };
+
   // test.addToDatabase();
-  return "huhuhh";
+  return new Response(JSON.stringify(resData));
 }
