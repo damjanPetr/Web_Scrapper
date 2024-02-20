@@ -17,12 +17,6 @@ async function Home() {
     },
   });
 
-  // const map: { [key: string]: (typeof instance)[0] } = {};
-  // instance.forEach((item) => {
-  //   map[item.title] === undefined ? (map[item.title] = item) : "";
-  // });
-  // console.log(instance);
-
   return (
     <div className="">
       <div className="">

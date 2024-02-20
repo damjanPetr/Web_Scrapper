@@ -130,10 +130,12 @@ export class page$ extends Action {
 }
 export class page$$ extends Action {
   private selector: string;
+  private filter: string | null = null;
 
   constructor(selector: string, filter: string) {
     super();
     this.selector = selector;
+    if (filter) this.filter = filter;
   }
   async execute() {
     if (this.state.page) {

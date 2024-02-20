@@ -21,11 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${source_sans_3.className}`}>
+      <body className={`${source_sans_3.className} `}>
         <Navbar />
-        <main className="mx-auto min-h-svh max-w-screen-xl   pb-4">
-          {children}
-        </main>
+        <main className="mx-auto min-h-svh max-w-screen-xl">{children}</main>
       </body>
     </html>
   );

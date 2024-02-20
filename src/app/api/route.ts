@@ -14,7 +14,8 @@ export async function POST(request: NextRequest) {
 
   test.addAction("addExtractType", "", selectorName, "href");
   test.addAction("addTitle", "test1");
-  test.addAction("page$$", "a");
+
+  test.addAction("page$$", selector);
   test.addAction("evaluateElements");
   test.addAction("printResult");
   await test.activate();
