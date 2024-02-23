@@ -108,6 +108,7 @@
   }
 
   .bubble::before {
+    --test_color: orange;
     content: "";
     z-index: -1;
     position: absolute;
@@ -116,18 +117,41 @@
     width: 1em;
     height: 1em;
     border-radius: 50%;
-    background-color: #3cefff;
+    background-color: var(--test_color);
     transform-origin: center;
     transform: translate3d(-50%, 50%, 0) scale3d(0, 0, 0);
-    transition: transform 0.45s ease-in-out;
+    transition: all 0.2s ease-in-out;
   }
 
-  .bubble:hover {
+  &.bubble:hover {
     cursor: pointer;
     color: #161616;
   }
 
-  .bubble:hover::before {
+  & :hover::before {
     transform: translate3d(-50%, 50%, 0) scale3d(15, 15, 15);
+  }
+
+  & :focus::before {
+    transform: translate3d(-50%, 50%, 0) scale3d(15, 15, 15);
+  }
+  & :focus {
+    outline: 4px solid;
+  }
+}
+
+.bubble.test_color_mod1 {
+  color: black;
+  background-color: hsl(50, 100%, 65%);
+  &:before {
+    --test_color: hsl(128, 100%, 50%);
+  }
+}
+
+.bubble.test_color_mod2 {
+  background: green;
+  color: white;
+  &:before {
+    --test_color: hsl(200, 100%, 50%);
   }
 }

@@ -1,29 +1,41 @@
 import { closeBrowserAction, loadBrowserAction } from "@/src/lib/Action";
 import { Invoker } from "@/src/lib/Invoker";
 import { NextRequest } from "next/server";
+import { actionsType } from "../add/page";
 
 export async function POST(request: NextRequest) {
-  const { link, title, selector, selectorName } = await request.json();
+  const body = await request.json();
+  const { link, title, selector, selectorName, selectorType } = body.options;
+  const actions = body.actions;
+
+  console.log("🚀 ✔ POST ✔ actions:", body);
 
   const test = new Invoker();
 
   test.setOnStart(new loadBrowserAction());
   test.setOnEnd(new closeBrowserAction());
-  test.addAction("addTitle", title);
   test.addAction("openNewPage", link);
 
-  test.addAction("addExtractType", "", selectorName, "href");
-  test.addAction("addTitle", "test1");
+  actions.forEach((action: actionsType) => {
+    if (action.actionName == "addExtractType" && action.params !== null) {
+      console.log(action.params);
+      test.addAction(
+        "addExtractType",
+        action?.params.selector,
+        action?.params.name,
+        action?.params.type,
+      );
+    }
+  });
 
-  test.addAction("page$$", selector);
+  test.addAction("addTitle", title);
+  test.addAction("page$$", selector, selectorType, selectorName);
   test.addAction("evaluateElements");
-  test.addAction("printResult");
+  // test.addAction("printResult");
   await test.activate();
 
   console.log(test.state.result);
   const resData = {
-    title: link,
-    link: title,
     result: test.state.result,
   };
 

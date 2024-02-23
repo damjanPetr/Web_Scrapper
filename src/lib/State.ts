@@ -6,6 +6,8 @@ export class State {
   public info = {
     title: "",
     link: "",
+    selectorType: "",
+    selectorName: "",
   };
 
   public action: string | null = null;

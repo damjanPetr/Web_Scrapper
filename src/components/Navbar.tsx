@@ -23,4 +23,5 @@ function Navbar({ children }: Props) {
     </div>
   );
 }
+
 export default Navbar;

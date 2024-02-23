@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Icon } from "@iconify-icon/react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -10,32 +9,43 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import ExtractElementInput from "@/src/components/ExtractElementInput";
-import { SyntheticEvent, useState, useReducer, Reducer } from "react";
+import { Icon } from "@iconify-icon/react";
+import { SyntheticEvent, useId, useReducer, useState } from "react";
 
 export type reducerAction =
   | {
       type: "removeAll";
     }
-  | { type: "remove"; name: string }
+  | { type: "remove"; uuid: string }
+  | { type: "update"; uuid: string; payload: actionsType["params"] }
   | {
       type: "add";
+      actionName: actionsType["actionName"];
     };
 
-type extractData = {
-  id: string;
-  name: string;
-  selector: string;
-  type: string;
+export type actionsType = {
+  uuid: string;
+  actionName: "addExtractType" | "openNewPage";
+  params: {
+    [key: string]: string;
+  } | null;
 };
+const initialReducerState: actionsType[] = [];
 
-const initialReducerState: extractData[] = [];
+const initialOptions = {
+  link: "",
+  title: "",
+  selector: "",
+  selectorType: "href",
+  selectorName: "",
+};
 
 function Add() {
   const [actions, dispatch] = useReducer(reducer, initialReducerState);
-  function addNewSelector(e: SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault();
-  }
+  const id = useId();
+
   const [loading, setLoading] = useState(false);
+
   const [data, setData] = useState<
     {
       link: string;
@@ -43,31 +53,38 @@ function Add() {
       [key: string]: any;
     }[]
   >([]);
+
   const [options, setOptions] = useState<{
     title: string;
     link: string;
     selector: string;
     selectorName: string;
     selectorType: string;
-  }>({
-    link: "",
-    title: "",
-    selector: "",
-    selectorType: "",
-    selectorName: "",
-  });
+  }>(initialOptions);
+
   async function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
     try {
-      console.log(options);
       e.preventDefault();
 
       setLoading(true);
+      const outputData = {
+        options,
+        actions,
+      };
+
+      const testMap = {};
+      const testData = actions.map((element) => {
+        element.actionName;
+        testMap[element.actionName] ? testMap[element.actionName] : "";
+      });
+
+      console.log(outputData);
       const response = await fetch(process.env.BASE_URL + "/api", {
         headers: {
           "Content-Type": "application/json",
         },
         method: "POST",
-        body: JSON.stringify(options),
+        body: JSON.stringify(outputData),
       });
       const json = await response.json();
 
@@ -83,14 +100,15 @@ function Add() {
 
   return (
     <div>
-      <form action="" onSubmit={handleSubmit} className="space-y-8 ">
+      {/* Form for initial selector input */}
+      <form action="" onSubmit={handleSubmit} className="mb-10 space-y-8">
         <fieldset
           className={`space-y-4 rounded border p-4${loading ? " bg-muted" : " bg-secondary"}`}
           disabled={loading}
         >
           <h2 className="  p-2 text-2xl font-bold">Add new item</h2>
           <div className="flex items-center gap-8">
-            <label htmlFor="title   " className="text-lg font-medium">
+            <label htmlFor={id + "title"} className="text-lg font-medium">
               Title
             </label>
             <Input
@@ -98,14 +116,14 @@ function Add() {
               name="title"
               className="text-lg font-medium"
               required
-              id="title"
+              id={id + "title"}
               onChange={(e) =>
                 setOptions({ ...options, title: e.target.value })
               }
             />
           </div>
           <div className="flex items-center gap-8">
-            <label htmlFor="link" className="text-lg font-semibold">
+            <label htmlFor={id + "link"} className="text-lg font-semibold">
               Link
             </label>
             <Input
@@ -113,13 +131,12 @@ function Add() {
               type="text"
               className="text-lg font-medium "
               name="link"
-              id="link"
+              id={id + "link"}
               onChange={(e) => setOptions({ ...options, link: e.target.value })}
             />
           </div>
         </fieldset>
 
-        {/* actions */}
         <div className=" space-y-4 bg-secondary p-4">
           <legend className="mb-8 border-b border-foreground text-xl font-semibold">
             Select Items to scrape
@@ -134,7 +151,7 @@ function Add() {
               required
               type="text"
               name="selectorName"
-              id="selectorName"
+              id={id + "selectorName"}
               onChange={(e) => {
                 setOptions({ ...options, selectorName: e.target.value });
               }}
@@ -145,7 +162,7 @@ function Add() {
               className="text-xl placeholder:text-xl placeholder:font-semibold"
               placeholder="selector"
               name="page$$"
-              id="page$$"
+              id={id + "page$$"}
               onChange={(e) =>
                 setOptions({ ...options, selector: e.target.value })
               }
@@ -167,9 +184,16 @@ function Add() {
           </fieldset>
         </div>
         <div className="flex items-center justify-between gap-4 p-4">
-          <Button variant="default" className="" type="submit">
-            Submit
-          </Button>
+          <div className="relative">
+            <Button variant="default" className="" type="submit">
+              Submit
+            </Button>
+            {loading && (
+              <div className="absolute inset-y-0 left-full ml-4 flex items-center text-white">
+                <Icon icon={"svg-spinners:wind-toy"} width={30} height={30} />
+              </div>
+            )}
+          </div>
           {data.length > 0 && (
             <Button
               variant="default"
@@ -183,103 +207,133 @@ function Add() {
           )}
 
           <div className="flex gap-8">
+            {actions.length > 0 && (
+              <Button
+                variant="default"
+                className="bg-red-300 "
+                disabled={loading}
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+
+                  dispatch({ type: "removeAll" });
+                }}
+              >
+                Remove All
+              </Button>
+            )}{" "}
             <Button
               variant="default"
               className="bg-fuchsia-300 "
               disabled={loading}
               type="button"
-              onClick={() => {
-                dispatch({ type: "add" });
+              onClick={(e) => {
+                e.preventDefault();
+                dispatch({ type: "add", actionName: "addExtractType" });
               }}
             >
               Add
             </Button>
-            <Button
-              variant="default"
-              className="bg-red-300 "
-              disabled={loading}
-              type="submit"
-              onClick={() => {
-                dispatch({ type: "removeAll" });
-              }}
-            >
-              Remove All
-            </Button>
           </div>
         </div>
-
         {actions.length > 0 &&
           actions.map((item) => {
-            return <ExtractElementInput dispatch={dispatch} key={item.id} />;
+            return (
+              <ExtractElementInput
+                disabled={loading}
+                dispatch={dispatch}
+                state={actions}
+                key={item.uuid}
+                uuid={item.uuid}
+              />
+            );
           })}
       </form>
-      {loading && (
-        <div className="w-full rounded-lg bg-blue-50 p-4">Loading...</div>
-      )}
-      {data.length > 0 &&
-        data.map((item) => {
-          return (
-            <div
-              key={crypto.randomUUID()}
-              className="w-full rounded-lg bg-blue-50 p-4 "
-            >
-              <div className="space-y-4 p-4">
-                <h1 className="text-2xl">
-                  <span className="font-semibold">Title:</span> {item.link}
-                </h1>
-                <h1 className="text-2xl">
-                  <span className="font-semibold">Link:</span> {item.title}
-                </h1>
+
+      {/* Results container */}
+
+      <div className="space-y-4">
+        {data.length > 0 &&
+          data.map((item) => {
+            return (
+              <div
+                key={crypto.randomUUID()}
+                className="w-full rounded-lg bg-blue-50 p-4 "
+              >
+                {/* Results */}
+                <div className="border">
+                  {item.result.length > 0 ? (
+                    item.result.map((result: any) => {
+                      return (
+                        <div
+                          key={crypto.randomUUID()}
+                          className="flex gap-8 border p-2 text-lg"
+                        >
+                          <p>{options.selectorName}</p>
+                          {options.selectorType === "href" ? (
+                            <a href={result[options.selectorName]} className="">
+                              {result[options.selectorType]}
+                            </a>
+                          ) : (
+                            <>
+                              <p>{}</p>
+                              <p>{result[options.selectorType]}</p>
+                            </>
+                          )}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p>No data found</p>
+                  )}
+                </div>
               </div>
-              {/* Results */}
-              <div className="border">
-                {item.result.length > 0 &&
-                  item.result.map((result: any) => {
-                    console.log(result);
-                    return (
-                      <div
-                        key={crypto.randomUUID()}
-                        className="flex gap-8 border p-2 text-lg"
-                      >
-                        <p>{options.selectorName}</p>
-                        {options.selectorType === "href" ? (
-                          <a href={result[options.selectorName]} className="">
-                            {result[options.selectorName]}
-                          </a>
-                        ) : (
-                          <p>{result[options.selectorName]}</p>
-                        )}
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+      </div>
     </div>
   );
 }
 
-function reducer(state: extractData[], action: reducerAction) {
+function reducer(state: typeof initialReducerState, action: reducerAction) {
   switch (action.type) {
     case "removeAll": {
       return [];
     }
     case "add": {
-      const newElement = {
-        id: crypto.randomUUID(),
-        name: "",
-        selector: "",
-        type: "",
-      };
-      return [...state, newElement];
+      switch (action.actionName) {
+        case "addExtractType": {
+          const newElement = {
+            uuid: crypto.randomUUID(),
+            actionName: action.actionName,
+            params: {
+              name: "",
+              selector: "",
+              type: "",
+            },
+          };
+          return [...state, newElement];
+        }
+        default:
+          return state;
+      }
     }
     case "remove": {
-      const newArray = state.filter((element) => element.name !== action.name);
+      const newArray = state.filter((element) => element.uuid !== action.uuid);
+      return newArray;
+    }
+    case "update": {
+      const newArray = state.map((element) => {
+        if (element.uuid === action.uuid) {
+          return { ...element, params: { ...action.payload } };
+        } else {
+          return element;
+        }
+      });
       return newArray;
     }
     default: {
-      return [...state];
+      return state;
     }
   }
 }
