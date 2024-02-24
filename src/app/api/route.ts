@@ -5,25 +5,27 @@ import { actionsType } from "../add/page";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
+
+  console.log("🚀 ✔ POST ✔ body:", body);
+
   const { link, title, selector, selectorName, selectorType } = body.options;
   const actions = body.actions;
-
-  console.log("🚀 ✔ POST ✔ actions:", body);
 
   const test = new Invoker();
 
   test.setOnStart(new loadBrowserAction());
-  test.setOnEnd(new closeBrowserAction());
+  // test.setOnEnd(new closeBrowserAction());
   test.addAction("openNewPage", link);
 
   actions.forEach((action: actionsType) => {
     if (action.actionName == "addExtractType" && action.params !== null) {
-      console.log(action.params);
+      console.log("action.params", action.params);
       test.addAction(
         "addExtractType",
         action?.params.selector,
         action?.params.name,
         action?.params.type,
+        action?.params.filter,
       );
     }
   });

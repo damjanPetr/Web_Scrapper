@@ -19,6 +19,7 @@ export class State {
         name: string;
         selector: string;
         type: Parameters<typeof toResult>[2];
+        filter: string;
       }[]
     | null = [];
   constructor() {}

@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -72,12 +73,6 @@ function Add() {
         actions,
       };
 
-      const testMap = {};
-      const testData = actions.map((element) => {
-        element.actionName;
-        testMap[element.actionName] ? testMap[element.actionName] : "";
-      });
-
       console.log(outputData);
       const response = await fetch(process.env.BASE_URL + "/api", {
         headers: {
@@ -106,11 +101,11 @@ function Add() {
           className={`space-y-4 rounded border p-4${loading ? " bg-muted" : " bg-secondary"}`}
           disabled={loading}
         >
-          <h2 className="  p-2 text-2xl font-bold">Add new item</h2>
+          <h2 className="  p-2 text-2xl font-bold">Add New Session</h2>
           <div className="flex items-center gap-8">
-            <label htmlFor={id + "title"} className="text-lg font-medium">
+            <Label htmlFor={id + "title"} className="text-lg font-medium">
               Title
-            </label>
+            </Label>
             <Input
               type="text"
               name="title"
@@ -123,9 +118,10 @@ function Add() {
             />
           </div>
           <div className="flex items-center gap-8">
-            <label htmlFor={id + "link"} className="text-lg font-semibold">
+            <Label htmlFor={id + "link"} className="text-lg font-medium">
               Link
-            </label>
+            </Label>
+
             <Input
               required
               type="text"
@@ -137,9 +133,9 @@ function Add() {
           </div>
         </fieldset>
 
-        <div className=" space-y-4 bg-secondary p-4">
-          <legend className="mb-8 border-b border-foreground text-xl font-semibold">
-            Select Items to scrape
+        <div className=" space-y-4 rounded bg-secondary p-4">
+          <legend className="mb-8 border-b border-foreground p-2 text-2xl font-semibold ">
+            Grab Items for Scraping
           </legend>
           <fieldset
             className={`flex gap-8 rounded ${loading ? " bg-slate-100" : ""}`}
@@ -147,7 +143,7 @@ function Add() {
           >
             <Input
               placeholder="name"
-              className="basis-1/3 text-xl placeholder:text-xl placeholder:font-semibold"
+              className="basis-1/3 text-xl placeholder:text-lg  placeholder:text-gray-400"
               required
               type="text"
               name="selectorName"
@@ -159,7 +155,7 @@ function Add() {
             <Input
               required
               type="text"
-              className="text-xl placeholder:text-xl placeholder:font-semibold"
+              className="text-xl placeholder:text-lg placeholder:text-gray-400"
               placeholder="selector"
               name="page$$"
               id={id + "page$$"}
@@ -185,32 +181,34 @@ function Add() {
         </div>
         <div className="flex items-center justify-between gap-4 p-4">
           <div className="relative">
-            <Button variant="default" className="" type="submit">
-              Submit
-            </Button>
+            <div className="flex gap-8 ">
+              <Button variant="default" className="" type="submit">
+                Submit
+              </Button>
+              {data.length > 0 && (
+                <Button
+                  variant="default"
+                  className="bg-red-400 hover:bg-red-600"
+                  disabled={loading}
+                  type="submit"
+                  onClick={() => setData([])}
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
             {loading && (
               <div className="absolute inset-y-0 left-full ml-4 flex items-center text-white">
                 <Icon icon={"svg-spinners:wind-toy"} width={30} height={30} />
               </div>
             )}
           </div>
-          {data.length > 0 && (
-            <Button
-              variant="default"
-              className=""
-              disabled={loading}
-              type="submit"
-              onClick={() => setData([])}
-            >
-              Clear
-            </Button>
-          )}
 
           <div className="flex gap-8">
             {actions.length > 0 && (
               <Button
                 variant="default"
-                className="bg-red-300 "
+                className="bg-red-400 "
                 disabled={loading}
                 type="submit"
                 onClick={(e) => {
@@ -224,7 +222,7 @@ function Add() {
             )}{" "}
             <Button
               variant="default"
-              className="bg-fuchsia-300 "
+              className="bg-cyan-700"
               disabled={loading}
               type="button"
               onClick={(e) => {
@@ -232,7 +230,7 @@ function Add() {
                 dispatch({ type: "add", actionName: "addExtractType" });
               }}
             >
-              Add
+              Add Sub-Element Selector
             </Button>
           </div>
         </div>
@@ -260,33 +258,52 @@ function Add() {
                 key={crypto.randomUUID()}
                 className="w-full rounded-lg bg-blue-50 p-4 "
               >
-                {/* Results */}
-                <div className="border">
-                  {item.result.length > 0 ? (
-                    item.result.map((result: any) => {
-                      return (
-                        <div
-                          key={crypto.randomUUID()}
-                          className="flex gap-8 border p-2 text-lg"
-                        >
-                          <p>{options.selectorName}</p>
-                          {options.selectorType === "href" ? (
-                            <a href={result[options.selectorName]} className="">
-                              {result[options.selectorType]}
-                            </a>
-                          ) : (
-                            <>
-                              <p>{}</p>
-                              <p>{result[options.selectorType]}</p>
-                            </>
-                          )}
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <p>No data found</p>
-                  )}
-                </div>
+                {/* Results rows*/}
+
+                {item.result.length > 0 ? (
+                  <div className="space-y-4">
+                    {item.result.map((element: any) => {
+                      /* When subelements are present */
+
+                      if (actions.length > 0) {
+                        <div className="">
+                          {item.result.map((element: any) => {
+                            const action = actions.map((action) => {
+                              const search = action.params!.name;
+                              return (
+                                <div
+                                  key={crypto.randomUUID()}
+                                  className="border-b border-foreground"
+                                >
+                                  <p>{element[search]}</p>
+                                </div>
+                              );
+                            });
+                            return action;
+                          })}
+                        </div>;
+                      } else {
+                        /* when subelements are not present */
+
+                        return (
+                          <div
+                            key={crypto.randomUUID()}
+                            className="border-b border-foreground p-2"
+                          >
+                            <p className="text-ellipsis">
+                              <strong className="mr-4">
+                                {options.selectorName}
+                              </strong>
+                              {element[options.selectorName]}
+                            </p>
+                          </div>
+                        );
+                      }
+                    })}
+                  </div>
+                ) : (
+                  <p>No data found</p>
+                )}
               </div>
             );
           })}
@@ -310,6 +327,7 @@ function reducer(state: typeof initialReducerState, action: reducerAction) {
               name: "",
               selector: "",
               type: "",
+              filter: "",
             },
           };
           return [...state, newElement];

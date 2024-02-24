@@ -142,7 +142,7 @@
 
 .bubble.test_color_mod1 {
   color: black;
-  background-color: hsl(50, 100%, 65%);
+  background-color: hsl(63, 100%, 70%);
   &:before {
     --test_color: hsl(128, 100%, 50%);
   }

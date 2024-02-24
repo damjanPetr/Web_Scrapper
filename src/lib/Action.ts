@@ -172,15 +172,17 @@ export class typeAction extends Action {
   }
 }
 export class addExtractTypeAction extends Action {
-  public selector: string = "";
-  public name: string;
-  public type: "textContent" | "href";
-  constructor(selector, name, type) {
+  constructor(
+    public selector: string = "",
+    public name: string,
+    public type: "textContent" | "href",
+    public filter: string = "",
+  ) {
     super();
     console.log("test", selector, name, type);
-    this.selector = selector;
-    this.name = name;
-    this.type = type;
+    // this.selector = selector;
+    // this.name = name;
+    // this.type = type;
   }
 
   async execute() {
@@ -189,9 +191,9 @@ export class addExtractTypeAction extends Action {
         name: this.name,
         selector: this.selector,
         type: this.type,
+        filter: this.filter,
       });
     }
-    console.log("huetonuhaont", this.state.extractParams);
   }
 }
 
@@ -216,30 +218,50 @@ export class evaluateElements extends Action {
 
     if (elementArray)
       for (let element of elementArray) {
-        if (subElementSelectors?.length > 0) {
-          const temp: { [key: string]: string } = {};
+        if (subElementSelectors && subElementSelectors?.length > 0) {
+          const innerTemp: { [key: string]: string } = {};
           await new Promise((resolve, reject) => {
-            subElementSelectors.forEach(async ({ name, selector, type }) => {
-              const value = await page?.evaluate(
-                (innerElement: any, type, selector) => {
-                  if (selector === "") {
-                    console.log(innerElement[type]);
-                    return innerElement[type];
-                  } else {
-                    const ele = innerElement.querySelector(selector);
-                    return ele[type];
-                  }
-                },
-                element,
-                type,
-                selector,
-              );
-              temp[name] = value;
-              resolve(value);
-            });
-          });
+            subElementSelectors.forEach(
+              async ({ name, selector, type, filter }) => {
+                const value = await page?.evaluate(
+                  (innerElement: any, type, selector, filter) => {
+                    if (selector === "") {
+                      return innerElement[type];
+                    } else {
+                      const ele = innerElement.querySelector(selector);
+                      if (filter !== "") {
+                        console.log(ele[type], filter, type);
+                        if (
+                          (ele[type] as string)
+                            .toLowerCase()
+                            .includes(filter.toLowerCase())
+                        ) {
+                          console.log("%c 'filter", "background: pink", true);
+                          return ele[type];
+                        } else {
+                          return null;
+                        }
+                      }
 
-          this.state.result.push(temp);
+                      return ele[type];
+                    }
+                  },
+                  element,
+                  type,
+                  selector,
+                  filter,
+                );
+                if (value === null) return resolve(null);
+                else {
+                  innerTemp[name] = value;
+                  resolve(value);
+                }
+              },
+            );
+          });
+          if (Object.keys(innerTemp).length != 0) {
+            this.state.result.push(innerTemp);
+          }
         } else {
           // const temp: { [key: string]: string } = {};
           const type = this.state.info.selectorType;
