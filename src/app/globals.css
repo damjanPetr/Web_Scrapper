@@ -2,14 +2,156 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer components {
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
   body {
-    background: repeating-linear-gradient(
-      to top left,
-      lightpink,
-      lightpink 5px,
-      white 5px,
-      white 10px
-    );
+    @apply text-foreground;
+    /* background-color: #8ec5fc; */
+    /* background-image: linear-gradient(62deg, #8ec5fc 0%, #e0c3fc 100%); */
+    background: linear-gradient(90deg, #3f2b96 0%, #a8c0ff 100%);
+  }
+}
+
+@layer components {
+  .text-gradient {
+    display: inline-block;
+    font-size: 48px;
+    line-height: 1;
+    font-weight: black;
+
+    background: linear-gradient(to top left, #f7941e, #72c6ef, #00a651);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+@layer utilities {
+  .bubble {
+    z-index: 1;
+    position: relative;
+    font-size: inherit;
+    font-family: inherit;
+    color: white;
+    padding: 0.5em 1em;
+    outline: none;
+    border: none;
+    background-color: hsl(236, 32%, 26%);
+    overflow: hidden;
+    transition: color 0.4s ease-in-out;
+  }
+
+  .bubble::before {
+    --test_color: orange;
+    content: "";
+    z-index: -1;
+    position: absolute;
+    bottom: 100%;
+    left: 100%;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    background-color: var(--test_color);
+    transform-origin: center;
+    transform: translate3d(-50%, 50%, 0) scale3d(0, 0, 0);
+    transition: all 0.2s ease-in-out;
+  }
+
+  &.bubble:hover {
+    cursor: pointer;
+    color: #161616;
+  }
+
+  & :hover::before {
+    transform: translate3d(-50%, 50%, 0) scale3d(15, 15, 15);
+  }
+
+  & :focus::before {
+    transform: translate3d(-50%, 50%, 0) scale3d(15, 15, 15);
+  }
+  & :focus {
+    outline: 4px solid;
+  }
+}
+
+.bubble.test_color_mod1 {
+  color: black;
+  background-color: hsl(50, 100%, 65%);
+  &:before {
+    --test_color: hsl(128, 100%, 50%);
+  }
+}
+
+.bubble.test_color_mod2 {
+  background: green;
+  color: white;
+  &:before {
+    --test_color: hsl(200, 100%, 50%);
   }
 }

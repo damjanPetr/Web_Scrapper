@@ -2,25 +2,23 @@ import { Page } from "puppeteer";
 import { State } from "./State";
 // import StealthPluggin from "puppeteer-extra-plugin-stealth";
 // import puppeteer from "puppeteer-extra";
-import puppeteer from "puppeteer";
-import { Invoker } from "./Invoker";
-import { openSync, writeFile, writeFileSync } from "fs";
-import db from "../database/Database";
 import { stringify } from "csv";
+import { writeFileSync } from "fs";
+import puppeteer from "puppeteer";
+import db from "../database/Database";
+import { Invoker } from "./Invoker";
 
 // puppeteer.use(StealthPluggin());
 
 export abstract class Action {
   protected uuid: number = Math.floor(Math.random() * 10000);
   protected name: string;
-  protected invoker: Invoker;
-  protected state: State;
+  protected invoker: Invoker | null = null;
+  protected state!: State;
 
   constructor() {
     this.name = this.constructor.name;
-    this.invoker = test;
-    this.state = this.invoker.state;
-    this.state.action = this.name;
+    this.invoker = null;
   }
 
   abstract execute(): any | Promise<any>;
@@ -28,8 +26,11 @@ export abstract class Action {
   toString() {
     return `${this.name} + UUID   ${this.uuid}`;
   }
-  addToDatabase(arg: any) {
-    db.action;
+
+  setInvoker(invoker: Invoker) {
+    this.invoker = invoker;
+    this.state = invoker.state;
+    this.state.action = this.name;
   }
 }
 export class addTitleAction extends Action {
@@ -49,7 +50,7 @@ export class loadBrowserAction extends Action {
   }
   async execute() {
     this.state.browser = await puppeteer.launch({
-      headless: "new",
+      headless: false,
     });
   }
 }
@@ -60,11 +61,9 @@ export class openNewPageAction extends Action {
     this.url = url;
   }
   async execute() {
-    if (this.state.browser) {
+    if (this.state.browser?.connected) {
       const page = await this.state.browser.newPage();
-      await page.goto(this.url, {
-        waitUntil: "domcontentloaded",
-      });
+      await page.goto(this.url);
       this.state.page = page;
       this.state.info.link = this.url;
     }
@@ -125,15 +124,22 @@ export class page$ extends Action {
   }
 }
 export class page$$ extends Action {
+  private selectorType: string;
   private selector: string;
+  private selectorName: string;
 
-  constructor(selector: string, filter: string) {
+  constructor(selector: string, selectorType: string, selectorName: string) {
     super();
+    this.selectorType = selectorType;
+    console.log(this.selectorType);
     this.selector = selector;
+    this.selectorName = selectorName;
   }
   async execute() {
     if (this.state.page) {
       const elements = await this.state.page.$$(this.selector);
+      this.state.info.selectorName = this.selectorName;
+      this.state.info.selectorType = this.selectorType;
       this.state.elements = elements;
     }
   }
@@ -166,12 +172,15 @@ export class typeAction extends Action {
   }
 }
 export class addExtractTypeAction extends Action {
-  constructor(
-    public selector: string = "",
-    public name: string,
-    public type: "textContent" | "href",
-  ) {
+  public selector: string = "";
+  public name: string;
+  public type: "textContent" | "href";
+  constructor(selector, name, type) {
     super();
+    console.log("test", selector, name, type);
+    this.selector = selector;
+    this.name = name;
+    this.type = type;
   }
 
   async execute() {
@@ -182,6 +191,7 @@ export class addExtractTypeAction extends Action {
         type: this.type,
       });
     }
+    console.log("huetonuhaont", this.state.extractParams);
   }
 }
 
@@ -190,18 +200,26 @@ export class evaluateElements extends Action {
     super();
   }
   async execute() {
-    const document: { [key: string]: string } = {};
+    /**
+     * subElementSelectors is an array of objects for extracting sub elements in
+     * a defined object with name, selector and type
+     */
     const page = this.state.page;
     const elementArray = this.state.elements;
-    const params = this.state.extractParams;
+
+    const subElementSelectors = this.state.extractParams;
+
+    console.log(
+      "🚀 ✔ evaluateElements ✔ execute ✔ subElementSelectors:",
+      subElementSelectors,
+    );
 
     if (elementArray)
       for (let element of elementArray) {
-        if (params) {
+        if (subElementSelectors?.length > 0) {
           const temp: { [key: string]: string } = {};
           await new Promise((resolve, reject) => {
-            params.forEach(async ({ name, selector, type }) => {
-              // console.count("paramsCounts");
+            subElementSelectors.forEach(async ({ name, selector, type }) => {
               const value = await page?.evaluate(
                 (innerElement: any, type, selector) => {
                   if (selector === "") {
@@ -216,13 +234,34 @@ export class evaluateElements extends Action {
                 type,
                 selector,
               );
-              // console.log(name, "::::", value);
               temp[name] = value;
               resolve(value);
             });
           });
 
           this.state.result.push(temp);
+        } else {
+          // const temp: { [key: string]: string } = {};
+          const type = this.state.info.selectorType;
+          const selectorName = this.state.info.selectorName;
+
+          console.log(
+            "🚀 ✔ evaluateElements ✔ execute ✔ selectorName:",
+            selectorName,
+          );
+
+          const returnElement = await page?.evaluate(
+            (innerElement: any, type) => {
+              return innerElement[type];
+            },
+            element,
+            type,
+          );
+          // temp[selectorName] = returnElement;
+
+          this.state.result.push({
+            [selectorName]: returnElement,
+          });
         }
       }
   }
@@ -250,7 +289,7 @@ export class printResultAction extends Action {
     super();
   }
   async execute() {
-    console.log(this.state.result);
+    // console.log(this.state.result);
     const info = [this.state.info.title, this.state.info.link];
 
     stringify(
@@ -264,22 +303,3 @@ export class printResultAction extends Action {
     );
   }
 }
-const test = new Invoker();
-
-(async () => {
-  test.setOnStart(new loadBrowserAction());
-  test.setOnEnd(new closeBrowserAction());
-  test.addAction("addTitle", "string");
-  test.addAction(
-    "openNewPage",
-    "https://haberdashpi.github.io/vscode-selection-utilities/stable/edit_text.html",
-  );
-
-  test.addAction("addExtractType", "", "link", "href");
-  test.addAction("addTitle", "test1");
-  test.addAction("page$$", "a");
-  test.addAction("evaluateElements");
-  test.addAction("printResult");
-  await test.activate();
-  test.addToDatabase();
-})();

@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client/extension";
 import db from "../database/Database";
-import { mapActions } from "./misc/types";
 import {
   Action,
   addExtractTypeAction,
@@ -17,6 +15,7 @@ import {
   waitForSelector,
 } from "./Action";
 import { State } from "./State";
+import { mapActions } from "./misc/types";
 
 interface addToDatabase {
   addToDatabase(): void;
@@ -65,15 +64,18 @@ export class Invoker implements addToDatabase {
     });
   }
   async activate() {
+    this.onStart?.setInvoker(this);
     await this.onStart?.execute();
     for (const { action, parameters } of this.actions) {
       try {
         const actionClass = new this.hashmap[action](...parameters);
+        actionClass.setInvoker(this);
         await actionClass.execute();
       } catch (err) {
-        if (err instanceof Error) console.log(err.name);
+        if (err instanceof Error) console.log(err);
       }
     }
+    this.onEnd?.setInvoker(this);
     await this.onEnd?.execute();
   }
   listActions() {
