@@ -250,7 +250,7 @@ function Add() {
 
       {/* Results container */}
 
-      <div className="space-y-4">
+      <div className="mb-8 space-y-4">
         {data.length > 0 &&
           data.map((item) => {
             return (

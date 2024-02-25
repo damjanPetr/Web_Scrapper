@@ -207,60 +207,75 @@ export class evaluateElements extends Action {
      * a defined object with name, selector and type
      */
     const page = this.state.page;
-    const elementArray = this.state.elements;
+    const stateElements = this.state.elements;
 
-    const subElementSelectors = this.state.extractParams;
+    const elementParameters = this.state.extractParams;
 
     console.log(
       "🚀 ✔ evaluateElements ✔ execute ✔ subElementSelectors:",
-      subElementSelectors,
+      elementParameters,
     );
 
-    if (elementArray)
-      for (let element of elementArray) {
-        if (subElementSelectors && subElementSelectors?.length > 0) {
-          const innerTemp: { [key: string]: string } = {};
-          await new Promise((resolve, reject) => {
-            subElementSelectors.forEach(
-              async ({ name, selector, type, filter }) => {
-                const value = await page?.evaluate(
-                  (innerElement: any, type, selector, filter) => {
-                    if (selector === "") {
-                      return innerElement[type];
-                    } else {
-                      const ele = innerElement.querySelector(selector);
-                      if (filter !== "") {
-                        console.log(ele[type], filter, type);
-                        if (
-                          (ele[type] as string)
-                            .toLowerCase()
-                            .includes(filter.toLowerCase())
-                        ) {
-                          console.log("%c 'filter", "background: pink", true);
-                          return ele[type];
-                        } else {
-                          return null;
-                        }
-                      }
+    if (stateElements) {
+      //* Loop through dom elements from the state
+      for (let element of stateElements) {
+        if (elementParameters && elementParameters?.length > 0) {
+          const elementResultObj: { [key: string]: string } = {};
 
-                      return ele[type];
+          let filterTemp = 0;
+          await new Promise((resolve, reject) => {
+            //* Loop through array of objects with from parameters
+
+            async function handleElement({
+              name,
+              selector,
+              type,
+              filter,
+            }: NonNullable<typeof elementParameters>[number]) {
+              const value = await page?.evaluate(
+                (innerElement: any, type, selector, filter) => {
+                  if (selector === "") {
+                    // * if selector is empty, return the type data form the original element
+                    if (innerElement[type] != null) return innerElement[type];
+                    else return null;
+                  } else {
+                    // * if selector is not empty return the type data targeted by the selector
+                    const ele = innerElement.querySelector(selector);
+                    console.log(ele);
+                    if (ele == null) return null;
+                    if (filter !== "") {
+                      console.log(ele[type], filter, type);
+                      if (
+                        (ele[type] as string)
+                          .toLowerCase()
+                          .includes(filter.toLowerCase())
+                      ) {
+                        console.log("%c 'filter", "background: pink", true);
+                        return ele[type];
+                      } else {
+                        return null;
+                      }
                     }
-                  },
-                  element,
-                  type,
-                  selector,
-                  filter,
-                );
-                if (value === null) return resolve(null);
-                else {
-                  innerTemp[name] = value;
-                  resolve(value);
-                }
-              },
-            );
+
+                    return ele[type];
+                  }
+                },
+                element,
+                type,
+                selector,
+                filter,
+              );
+              if (value === null) return resolve(null);
+              else {
+                elementResultObj[name] = value;
+                resolve(value);
+              }
+            }
+
+            elementParameters.forEach(handleElement);
           });
-          if (Object.keys(innerTemp).length != 0) {
-            this.state.result.push(innerTemp);
+          if (Object.keys(elementResultObj).length != 0) {
+            this.state.result.push(elementResultObj);
           }
         } else {
           // const temp: { [key: string]: string } = {};
@@ -268,7 +283,7 @@ export class evaluateElements extends Action {
           const selectorName = this.state.info.selectorName;
 
           console.log(
-            "🚀 ✔ evaluateElements ✔ execute ✔ selectorName:",
+            "🚀 🟦 evaluateElements 🟦 execute 🟦 selectorName:",
             selectorName,
           );
 
@@ -286,6 +301,10 @@ export class evaluateElements extends Action {
           });
         }
       }
+    }
+    {
+      throw new Error("No elements found");
+    }
   }
 }
 
@@ -303,9 +322,6 @@ export class writeToCsv extends Action {
   }
 }
 
-type AllHTMLElementProperties = {
-  [K in keyof HTMLElementTagNameMap]: HTMLElementTagNameMap[K];
-};
 export class printResultAction extends Action {
   constructor() {
     super();
