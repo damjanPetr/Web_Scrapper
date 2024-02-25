@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import ExtractElementInput from "@/src/components/ExtractElementInput";
 import { Icon } from "@iconify-icon/react";
-import { SyntheticEvent, useId, useReducer, useState } from "react";
+import { SyntheticEvent, useEffect, useId, useReducer, useState } from "react";
 
 export type reducerAction =
   | {
@@ -85,7 +85,7 @@ function Add() {
 
       console.log(json);
 
-      setData([...data, json]);
+      setData([json]);
     } catch (err) {
       if (err instanceof Error) throw new Error(err.message);
     } finally {
@@ -96,7 +96,12 @@ function Add() {
   return (
     <div>
       {/* Form for initial selector input */}
-      <form action="" onSubmit={handleSubmit} className="mb-10 space-y-8">
+      <form
+        action=""
+        onSubmit={handleSubmit}
+        className="mb-10 space-y-8"
+        id="addForm"
+      >
         <fieldset
           className={`space-y-4 rounded border p-4${loading ? " bg-muted" : " bg-secondary"}`}
           disabled={loading}
@@ -164,6 +169,7 @@ function Add() {
               }
             />
             <Select
+              name="selectorType"
               defaultValue="href"
               onValueChange={(e) => {
                 setOptions({ ...options, selectorType: e });
@@ -234,23 +240,33 @@ function Add() {
             </Button>
           </div>
         </div>
-        {actions.length > 0 &&
-          actions.map((item) => {
-            return (
-              <ExtractElementInput
-                disabled={loading}
-                dispatch={dispatch}
-                state={actions}
-                key={item.uuid}
-                uuid={item.uuid}
-              />
-            );
-          })}
+        <section>
+          {actions.length > 0 &&
+            actions.map((item) => {
+              return (
+                <ExtractElementInput
+                  disabled={loading}
+                  dispatch={dispatch}
+                  state={actions}
+                  key={item.uuid}
+                  uuid={item.uuid}
+                />
+              );
+            })}
+        </section>
       </form>
 
       {/* Results container */}
 
-      <div className="mb-8 space-y-4">
+      <div
+        className="mb-8 space-y-4"
+        id="results"
+        onClick={(e) => {
+          console.log(data[0].result.length > 0);
+          console.log("uuu", e.currentTarget.dataset.res);
+        }}
+        data-res={data[0] && data[0].result.length > 0 ? true : false}
+      >
         {data.length > 0 &&
           data.map((item) => {
             return (
@@ -267,19 +283,16 @@ function Add() {
 
                       if (actions.length > 0) {
                         <div className="">
-                          {item.result.map((element: any) => {
-                            const action = actions.map((action) => {
-                              const search = action.params!.name;
+                          {item.result.map((resultElement: any) => {
+                            return Object.keys(resultElement).map((key, i) => {
+                              console.log(key, resultElement[key]);
                               return (
-                                <div
-                                  key={crypto.randomUUID()}
-                                  className="border-b border-foreground"
-                                >
-                                  <p>{element[search]}</p>
+                                <div key={i} className="">
+                                  <p>{resultElement[key]}</p>
+                                  zzzzz
                                 </div>
                               );
                             });
-                            return action;
                           })}
                         </div>;
                       } else {

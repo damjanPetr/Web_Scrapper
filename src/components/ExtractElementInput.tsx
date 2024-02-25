@@ -77,7 +77,7 @@ function ExtractElementInput({ dispatch, uuid, state, disabled }: Props) {
         {/* Dropdown */}
 
         <div className="space-y-4 ">
-          <Label htmlFor={id + `type`} className="text-lg text-white ">
+          <Label htmlFor={id + `type`} className="text-lg text-white">
             Type
           </Label>
           <select
@@ -85,8 +85,8 @@ function ExtractElementInput({ dispatch, uuid, state, disabled }: Props) {
               console.log(data);
               setData({ ...data, type: e.target.value });
             }}
-            value={`href`}
-            id={uuid}
+            value={data.type}
+            id={id + `type`}
             className="block rounded px-3 py-2  font-semibold  "
           >
             <option value="href">Link Url</option>
@@ -122,7 +122,6 @@ function ExtractElementInput({ dispatch, uuid, state, disabled }: Props) {
           <Input
             placeholder="e.g. price:30"
             className="basis-1/3 text-xl placeholder:text-lg  placeholder:text-gray-400"
-            required
             type="text"
             name="selectorName"
             id={id + `filter`}

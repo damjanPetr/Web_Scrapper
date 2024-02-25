@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   const test = new Invoker();
 
   test.setOnStart(new loadBrowserAction());
-  // test.setOnEnd(new closeBrowserAction());
+  test.setOnEnd(new closeBrowserAction());
   test.addAction("openNewPage", link);
 
   actions.forEach((action: actionsType) => {
