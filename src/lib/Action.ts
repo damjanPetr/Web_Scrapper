@@ -222,6 +222,13 @@ export class evaluateElements extends Action {
         if (elementParameters && elementParameters?.length > 0) {
           const elementResultObj: { [key: string]: string } = {};
 
+          // * add normal selector parameter if
+          elementParameters.push({
+            name: this.state.info.selectorName,
+            selector: "",
+            type: this.state.info.selectorType,
+          });
+
           let filterTemp = 0;
           await new Promise((resolve, reject) => {
             //* Loop through array of objects with from parameters

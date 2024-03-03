@@ -45,6 +45,7 @@ function Add() {
   const [actions, dispatch] = useReducer(reducer, initialReducerState);
   const id = useId();
 
+  const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const [data, setData] = useState<
@@ -81,11 +82,36 @@ function Add() {
         method: "POST",
         body: JSON.stringify(outputData),
       });
-      const json = await response.json();
 
-      console.log(json);
+      const chunks = [];
+      while (true) {
+        const reader = response.body?.getReader();
 
-      setData([json]);
+        if (reader) {
+          const { done, value } = await reader?.read();
+          const chunk = new TextDecoder().decode(value);
+
+          console.log(chunk);
+
+          if (chunk.startsWith("{")) {
+            const jsonData = JSON.parse(chunk);
+            setData([jsonData]);
+          } else {
+            setProgress(parseInt(chunk));
+          }
+          if (done) {
+            setProgress(0);
+            break;
+          }
+        }
+        reader?.releaseLock();
+      }
+
+      // const json = await response.json();
+
+      // console.log(json);
+
+      // setData([json]);
     } catch (err) {
       if (err instanceof Error) throw new Error(err.message);
     } finally {
@@ -188,9 +214,28 @@ function Add() {
         <div className="flex items-center justify-between gap-4 p-4">
           <div className="relative">
             <div className="flex gap-8 ">
-              <Button variant="default" className="" type="submit">
+              <Button
+                variant="default"
+                className=""
+                type="submit"
+                disabled={loading}
+              >
                 Submit
               </Button>
+              {loading && (
+                <Button
+                  variant="default"
+                  className="bg-violet-400 "
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+
+                    dispatch({ type: "removeAll" });
+                  }}
+                >
+                  Cancel
+                </Button>
+              )}
               {data.length > 0 && (
                 <Button
                   variant="default"
@@ -206,6 +251,14 @@ function Add() {
             {loading && (
               <div className="absolute inset-y-0 left-full ml-4 flex items-center text-white">
                 <Icon icon={"svg-spinners:wind-toy"} width={30} height={30} />
+                <label htmlFor="loadingProgress">Progress...</label>
+                <progress
+                  id="loadingProgress"
+                  className=""
+                  value={progress}
+                  max={100}
+                />
+                {progress}%
               </div>
             )}
           </div>
@@ -261,10 +314,6 @@ function Add() {
       <div
         className="mb-8 space-y-4"
         id="results"
-        onClick={(e) => {
-          console.log(data[0].result.length > 0);
-          console.log("uuu", e.currentTarget.dataset.res);
-        }}
         data-res={data[0] && data[0].result.length > 0 ? true : false}
       >
         {data.length > 0 &&
@@ -285,7 +334,7 @@ function Add() {
                         <div className="">
                           {item.result.map((resultElement: any) => {
                             return Object.keys(resultElement).map((key, i) => {
-                              console.log(key, resultElement[key]);
+                              // console.log(key, resultElement[key]);
                               return (
                                 <div key={i} className="">
                                   <p>{resultElement[key]}</p>

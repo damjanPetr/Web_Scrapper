@@ -42,5 +42,22 @@ export async function POST(request: NextRequest) {
   };
 
   // test.addToDatabase();
-  return new Response(JSON.stringify(resData));
+  return new Response(
+    new ReadableStream({
+      start(controller) {
+        let percent = 0;
+        const interval = setInterval(() => {
+          percent += 10;
+          if (percent >= 100) {
+            controller.enqueue(JSON.stringify(resData));
+            controller.close();
+            clearInterval(interval);
+          } else {
+            controller.enqueue(percent.toString());
+          }
+        }, 1000);
+      },
+    }),
+  );
+  // return new Response(JSON.stringify(resData));
 }

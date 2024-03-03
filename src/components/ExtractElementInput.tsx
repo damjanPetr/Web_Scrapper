@@ -62,7 +62,6 @@ function ExtractElementInput({ dispatch, uuid, state, disabled }: Props) {
             Css Selector
           </Label>
           <Input
-            required
             type="text"
             className="text-xl placeholder:text-lg  placeholder:text-gray-400"
             placeholder="e.g. h1 > div"
