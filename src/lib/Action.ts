@@ -211,12 +211,11 @@ export class evaluateElements extends Action {
     const page = this.state.page;
     const stateElements = this.state.elements;
 
+    this.state.progress = 0;
     const elementParameters = this.state.extractParams;
 
-    console.log(
-      "🚀 ✔ evaluateElements ✔ execute ✔ subElementSelectors:",
-      elementParameters,
-    );
+    // * clean result array
+    this.state.result = [];
 
     if (stateElements) {
       //* Loop through dom elements from the state
@@ -229,9 +228,9 @@ export class evaluateElements extends Action {
             name: this.state.info.selectorName,
             selector: "",
             type: this.state.info.selectorType,
+            filter: "",
           });
 
-          let filterTemp = 0;
           await new Promise((resolve, reject) => {
             //* Loop through array of objects with from parameters
             async function handleElement({
@@ -290,11 +289,6 @@ export class evaluateElements extends Action {
           const type = this.state.info.selectorType;
           const selectorName = this.state.info.selectorName;
 
-          console.log(
-            "🚀 🟦 evaluateElements 🟦 execute 🟦 selectorName:",
-            selectorName,
-          );
-
           const returnElement = await page?.evaluate(
             (innerElement: any, type) => {
               return innerElement[type];
@@ -321,9 +315,8 @@ export class writeToCsv extends Action {
     // writeFileSync("./result.csv", JSON.stringify(this.state.result) + "\r", {
     //   flag: "a",
     // });
-
     // const data = this.state.result.map((obj) => {});
-    console.log(this.state.result);
+    // console.log(this.state.result);
   }
 }
 
@@ -332,7 +325,6 @@ export class printResultAction extends Action {
     super();
   }
   async execute() {
-    // console.log(this.state.result);
     const info = [this.state.info.title, this.state.info.link];
 
     stringify(

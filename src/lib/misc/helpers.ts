@@ -1,7 +1,7 @@
 export function toResult(
   element: any,
   innerSelector: string,
-  extractType: "textContent" | "href"
+  extractType: string,
 ) {
   const e = element.querySelector(`${innerSelector}`);
   if (e) {

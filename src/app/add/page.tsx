@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -53,12 +54,11 @@ function Add() {
   const id = useId();
   const [downBtnState, setDownBtnState] = useState(false);
 
+  const [cancelStream, setCancelStream] = useState(false);
   const downBtn = useRef(null);
 
   //* Scroll down button
   useEffect(() => {
-    console.log(downBtn);
-
     const handleScroll = () => {
       if (window.scrollY > 100) setDownBtnState(true);
       else setDownBtnState(false);
@@ -113,18 +113,21 @@ function Add() {
 
         if (reader) {
           const { done, value } = await reader?.read();
+
           const chunk = new TextDecoder().decode(value);
 
-          console.log(chunk);
-
           if (chunk.startsWith("{")) {
-            const jsonData = JSON.parse(chunk);
-            setData([jsonData]);
+            console.log("label", new TextDecoder().decode(value));
+            // const jsonData = JSON.parse(chunk);
+            // console.log(jsonData);
+            // setData([jsonData]);
           } else {
             setProgress(parseInt(chunk));
           }
+
           if (done) {
             setProgress(0);
+            reader.cancel("cancelled");
             break;
           }
         }
@@ -134,29 +137,31 @@ function Add() {
       if (err instanceof Error) throw new Error(err.message);
     } finally {
       setLoading(false);
+      setCancelStream(false);
     }
   }
 
   return (
     <div>
       {/* Down Button */}(
-      {downBtnState && (
-        <button
-          ref={downBtn}
-          type="button"
-          className=""
-          onClick={() => {
-            window.scrollTo(0, 0);
-          }}
-        >
-          <Icon
-            icon="mdi:arrow-up"
-            width={30}
-            height={30}
-            className="fixed bottom-10 right-10 rounded bg-violet-400 p-4 text-white "
-          />
-        </button>
-      )}
+      <button
+        ref={downBtn}
+        type="button"
+        className={
+          "transition-opacity " +
+          (downBtnState === true ? "opacity-100" : "opacity-0")
+        }
+        onClick={() => {
+          window.scrollTo(0, 0);
+        }}
+      >
+        <Icon
+          icon="mdi:arrow-up"
+          width={30}
+          height={30}
+          className="fixed bottom-10 right-10 rounded bg-violet-400 p-4 text-white "
+        />
+      </button>
       ){/* Form for initial selector input */}
       <form
         action=""
@@ -262,11 +267,9 @@ function Add() {
                 <Button
                   variant="default"
                   className="bg-violet-400 "
-                  type="submit"
+                  type="button"
                   onClick={(e) => {
-                    e.preventDefault();
-
-                    dispatch({ type: "removeAll" });
+                    setCancelStream(true);
                   }}
                 >
                   Cancel
@@ -288,11 +291,10 @@ function Add() {
               <div className="absolute inset-y-0 left-full ml-4 flex items-center text-white">
                 <Icon icon={"svg-spinners:wind-toy"} width={30} height={30} />
                 <label htmlFor="loadingProgress">Progress...</label>
-                <progress
+                <Progress
                   id="loadingProgress"
-                  className=""
-                  value={progress}
-                  max={100}
+                  value={33}
+                  className="accent-green-400"
                 />
                 {progress}%
               </div>
@@ -386,7 +388,7 @@ function Add() {
                             key={crypto.randomUUID()}
                             className="border-b border-foreground p-2"
                           >
-                            <p className="text-ellipsis">
+                            <p className=" break-words">
                               <strong className="mr-4">
                                 {options.selectorName}
                               </strong>

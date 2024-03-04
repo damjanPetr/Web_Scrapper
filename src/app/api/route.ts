@@ -35,28 +35,35 @@ export async function POST(request: NextRequest) {
   test.addAction("evaluateElements");
   // test.addAction("printResult");
 
-  console.log(test.state.result);
-  const resData = {
-    result: test.state.result,
-  };
+  // const resData = {
+  //   result: test.state.result,
+  // };
+  // console.log(resData);
 
   // test.addToDatabase();
   return new Response(
     new ReadableStream({
       async start(controller) {
         let done = false;
-        const interval = setInterval(async () => {
+        const interval = setInterval(() => {
           const percent = test.state.progress;
-          if (done) {
-            controller.enqueue(JSON.stringify(resData));
-            controller.close();
+          try {
+            if (done === true) {
+              controller.enqueue(JSON.stringify({ result: test.state.result }));
+              // controller.enqueue(JSON.stringify(resData));
+              clearInterval(interval);
+              controller.close();
+            } else {
+              controller.enqueue(percent.toString());
+            }
+          } catch (err) {
+            if (err instanceof Error) console.log(err);
+          } finally {
             clearInterval(interval);
-          } else {
-            controller.enqueue(percent.toString());
           }
-        }, 200);
+        }, 100);
+
         await test.activate();
-        done = true;
       },
     }),
   );
