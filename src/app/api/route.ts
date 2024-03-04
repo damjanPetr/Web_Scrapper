@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
   test.addAction("page$$", selector, selectorType, selectorName);
   test.addAction("evaluateElements");
   // test.addAction("printResult");
-  await test.activate();
 
   console.log(test.state.result);
   const resData = {
@@ -44,18 +43,20 @@ export async function POST(request: NextRequest) {
   // test.addToDatabase();
   return new Response(
     new ReadableStream({
-      start(controller) {
-        let percent = 0;
-        const interval = setInterval(() => {
-          percent += 10;
-          if (percent >= 100) {
+      async start(controller) {
+        let done = false;
+        const interval = setInterval(async () => {
+          const percent = test.state.progress;
+          if (done) {
             controller.enqueue(JSON.stringify(resData));
             controller.close();
             clearInterval(interval);
           } else {
             controller.enqueue(percent.toString());
           }
-        }, 1000);
+        }, 200);
+        await test.activate();
+        done = true;
       },
     }),
   );

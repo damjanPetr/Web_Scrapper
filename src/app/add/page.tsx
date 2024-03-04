@@ -11,7 +11,14 @@ import {
 } from "@/components/ui/select";
 import ExtractElementInput from "@/src/components/ExtractElementInput";
 import { Icon } from "@iconify-icon/react";
-import { SyntheticEvent, useEffect, useId, useReducer, useState } from "react";
+import {
+  SyntheticEvent,
+  useEffect,
+  useId,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 
 export type reducerAction =
   | {
@@ -44,6 +51,24 @@ const initialOptions = {
 function Add() {
   const [actions, dispatch] = useReducer(reducer, initialReducerState);
   const id = useId();
+  const [downBtnState, setDownBtnState] = useState(false);
+
+  const downBtn = useRef(null);
+
+  //* Scroll down button
+  useEffect(() => {
+    console.log(downBtn);
+
+    const handleScroll = () => {
+      if (window.scrollY > 100) setDownBtnState(true);
+      else setDownBtnState(false);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -83,7 +108,6 @@ function Add() {
         body: JSON.stringify(outputData),
       });
 
-      const chunks = [];
       while (true) {
         const reader = response.body?.getReader();
 
@@ -106,12 +130,6 @@ function Add() {
         }
         reader?.releaseLock();
       }
-
-      // const json = await response.json();
-
-      // console.log(json);
-
-      // setData([json]);
     } catch (err) {
       if (err instanceof Error) throw new Error(err.message);
     } finally {
@@ -121,7 +139,25 @@ function Add() {
 
   return (
     <div>
-      {/* Form for initial selector input */}
+      {/* Down Button */}(
+      {downBtnState && (
+        <button
+          ref={downBtn}
+          type="button"
+          className=""
+          onClick={() => {
+            window.scrollTo(0, 0);
+          }}
+        >
+          <Icon
+            icon="mdi:arrow-up"
+            width={30}
+            height={30}
+            className="fixed bottom-10 right-10 rounded bg-violet-400 p-4 text-white "
+          />
+        </button>
+      )}
+      ){/* Form for initial selector input */}
       <form
         action=""
         onSubmit={handleSubmit}
@@ -236,7 +272,7 @@ function Add() {
                   Cancel
                 </Button>
               )}
-              {data.length > 0 && (
+              {data.length > 0 && !loading && (
                 <Button
                   variant="default"
                   className="bg-red-400 hover:bg-red-600"
@@ -308,9 +344,7 @@ function Add() {
             })}
         </section>
       </form>
-
       {/* Results container */}
-
       <div
         className="mb-8 space-y-4"
         id="results"

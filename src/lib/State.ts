@@ -10,6 +10,7 @@ export class State {
     selectorName: "",
   };
 
+  public progress: number = 0;
   public action: string | null = null;
   public browser: Browser | null = null;
   public elements: ElementHandle[] | null = null;

@@ -33,6 +33,7 @@ export abstract class Action {
     this.state.action = this.name;
   }
 }
+
 export class addTitleAction extends Action {
   public title: string;
   constructor(title: string) {
@@ -144,6 +145,7 @@ export class page$$ extends Action {
     }
   }
 }
+
 export class waitForSelector extends Action {
   private selector: string;
 
@@ -232,7 +234,6 @@ export class evaluateElements extends Action {
           let filterTemp = 0;
           await new Promise((resolve, reject) => {
             //* Loop through array of objects with from parameters
-
             async function handleElement({
               name,
               selector,
@@ -272,6 +273,7 @@ export class evaluateElements extends Action {
                 selector,
                 filter,
               );
+
               if (value === null) return resolve(null);
               else {
                 elementResultObj[name] = value;
@@ -285,7 +287,6 @@ export class evaluateElements extends Action {
             this.state.result.push(elementResultObj);
           }
         } else {
-          // const temp: { [key: string]: string } = {};
           const type = this.state.info.selectorType;
           const selectorName = this.state.info.selectorName;
 
@@ -301,16 +302,13 @@ export class evaluateElements extends Action {
             element,
             type,
           );
-          // temp[selectorName] = returnElement;
 
           this.state.result.push({
             [selectorName]: returnElement,
           });
         }
+        this.state.progress += (1 / stateElements.length) * 100;
       }
-    }
-    {
-      throw new Error("No elements found");
     }
   }
 }
