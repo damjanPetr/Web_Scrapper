@@ -10,6 +10,7 @@ export class State {
     selectorName: "",
   };
 
+  public progress: number = 0;
   public action: string | null = null;
   public browser: Browser | null = null;
   public elements: ElementHandle[] | null = null;
@@ -19,6 +20,7 @@ export class State {
         name: string;
         selector: string;
         type: Parameters<typeof toResult>[2];
+        filter: string;
       }[]
     | null = [];
   constructor() {}

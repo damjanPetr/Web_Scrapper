@@ -1,6 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -10,7 +12,14 @@ import {
 } from "@/components/ui/select";
 import ExtractElementInput from "@/src/components/ExtractElementInput";
 import { Icon } from "@iconify-icon/react";
-import { SyntheticEvent, useId, useReducer, useState } from "react";
+import {
+  SyntheticEvent,
+  useEffect,
+  useId,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 
 export type reducerAction =
   | {
@@ -43,7 +52,25 @@ const initialOptions = {
 function Add() {
   const [actions, dispatch] = useReducer(reducer, initialReducerState);
   const id = useId();
+  const [downBtnState, setDownBtnState] = useState(false);
 
+  const [cancelStream, setCancelStream] = useState(false);
+  const downBtn = useRef(null);
+
+  //* Scroll down button
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) setDownBtnState(true);
+      else setDownBtnState(false);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const [data, setData] = useState<
@@ -72,12 +99,6 @@ function Add() {
         actions,
       };
 
-      const testMap = {};
-      const testData = actions.map((element) => {
-        element.actionName;
-        testMap[element.actionName] ? testMap[element.actionName] : "";
-      });
-
       console.log(outputData);
       const response = await fetch(process.env.BASE_URL + "/api", {
         headers: {
@@ -86,31 +107,77 @@ function Add() {
         method: "POST",
         body: JSON.stringify(outputData),
       });
-      const json = await response.json();
 
-      console.log(json);
+      while (true) {
+        const reader = response.body?.getReader();
 
-      setData([...data, json]);
+        if (reader) {
+          const { done, value } = await reader?.read();
+
+          const chunk = new TextDecoder().decode(value);
+
+          if (chunk.startsWith("{")) {
+            console.log("label", new TextDecoder().decode(value));
+            // const jsonData = JSON.parse(chunk);
+            // console.log(jsonData);
+            // setData([jsonData]);
+          } else {
+            setProgress(parseInt(chunk));
+          }
+
+          if (done) {
+            setProgress(0);
+            reader.cancel("cancelled");
+            break;
+          }
+        }
+        reader?.releaseLock();
+      }
     } catch (err) {
       if (err instanceof Error) throw new Error(err.message);
     } finally {
       setLoading(false);
+      setCancelStream(false);
     }
   }
 
   return (
     <div>
-      {/* Form for initial selector input */}
-      <form action="" onSubmit={handleSubmit} className="mb-10 space-y-8">
+      {/* Down Button */}(
+      <button
+        ref={downBtn}
+        type="button"
+        className={
+          "transition-opacity " +
+          (downBtnState === true ? "opacity-100" : "opacity-0")
+        }
+        onClick={() => {
+          window.scrollTo(0, 0);
+        }}
+      >
+        <Icon
+          icon="mdi:arrow-up"
+          width={30}
+          height={30}
+          className="fixed bottom-10 right-10 rounded bg-violet-400 p-4 text-white "
+        />
+      </button>
+      ){/* Form for initial selector input */}
+      <form
+        action=""
+        onSubmit={handleSubmit}
+        className="mb-10 space-y-8"
+        id="addForm"
+      >
         <fieldset
           className={`space-y-4 rounded border p-4${loading ? " bg-muted" : " bg-secondary"}`}
           disabled={loading}
         >
-          <h2 className="  p-2 text-2xl font-bold">Add new item</h2>
+          <h2 className="  p-2 text-2xl font-bold">Add New Session</h2>
           <div className="flex items-center gap-8">
-            <label htmlFor={id + "title"} className="text-lg font-medium">
+            <Label htmlFor={id + "title"} className="text-lg font-medium">
               Title
-            </label>
+            </Label>
             <Input
               type="text"
               name="title"
@@ -123,9 +190,10 @@ function Add() {
             />
           </div>
           <div className="flex items-center gap-8">
-            <label htmlFor={id + "link"} className="text-lg font-semibold">
+            <Label htmlFor={id + "link"} className="text-lg font-medium">
               Link
-            </label>
+            </Label>
+
             <Input
               required
               type="text"
@@ -137,9 +205,9 @@ function Add() {
           </div>
         </fieldset>
 
-        <div className=" space-y-4 bg-secondary p-4">
-          <legend className="mb-8 border-b border-foreground text-xl font-semibold">
-            Select Items to scrape
+        <div className=" space-y-4 rounded bg-secondary p-4">
+          <legend className="mb-8 border-b border-foreground p-2 text-2xl font-semibold ">
+            Grab Items for Scraping
           </legend>
           <fieldset
             className={`flex gap-8 rounded ${loading ? " bg-slate-100" : ""}`}
@@ -147,7 +215,7 @@ function Add() {
           >
             <Input
               placeholder="name"
-              className="basis-1/3 text-xl placeholder:text-xl placeholder:font-semibold"
+              className="basis-1/3 text-xl placeholder:text-lg  placeholder:text-gray-400"
               required
               type="text"
               name="selectorName"
@@ -159,7 +227,7 @@ function Add() {
             <Input
               required
               type="text"
-              className="text-xl placeholder:text-xl placeholder:font-semibold"
+              className="text-xl placeholder:text-lg placeholder:text-gray-400"
               placeholder="selector"
               name="page$$"
               id={id + "page$$"}
@@ -168,6 +236,7 @@ function Add() {
               }
             />
             <Select
+              name="selectorType"
               defaultValue="href"
               onValueChange={(e) => {
                 setOptions({ ...options, selectorType: e });
@@ -185,32 +254,58 @@ function Add() {
         </div>
         <div className="flex items-center justify-between gap-4 p-4">
           <div className="relative">
-            <Button variant="default" className="" type="submit">
-              Submit
-            </Button>
+            <div className="flex gap-8 ">
+              <Button
+                variant="default"
+                className=""
+                type="submit"
+                disabled={loading}
+              >
+                Submit
+              </Button>
+              {loading && (
+                <Button
+                  variant="default"
+                  className="bg-violet-400 "
+                  type="button"
+                  onClick={(e) => {
+                    setCancelStream(true);
+                  }}
+                >
+                  Cancel
+                </Button>
+              )}
+              {data.length > 0 && !loading && (
+                <Button
+                  variant="default"
+                  className="bg-red-400 hover:bg-red-600"
+                  disabled={loading}
+                  type="submit"
+                  onClick={() => setData([])}
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
             {loading && (
               <div className="absolute inset-y-0 left-full ml-4 flex items-center text-white">
                 <Icon icon={"svg-spinners:wind-toy"} width={30} height={30} />
+                <label htmlFor="loadingProgress">Progress...</label>
+                <Progress
+                  id="loadingProgress"
+                  value={33}
+                  className="accent-green-400"
+                />
+                {progress}%
               </div>
             )}
           </div>
-          {data.length > 0 && (
-            <Button
-              variant="default"
-              className=""
-              disabled={loading}
-              type="submit"
-              onClick={() => setData([])}
-            >
-              Clear
-            </Button>
-          )}
 
           <div className="flex gap-8">
             {actions.length > 0 && (
               <Button
                 variant="default"
-                className="bg-red-300 "
+                className="bg-red-400 "
                 disabled={loading}
                 type="submit"
                 onClick={(e) => {
@@ -224,7 +319,7 @@ function Add() {
             )}{" "}
             <Button
               variant="default"
-              className="bg-fuchsia-300 "
+              className="bg-cyan-700"
               disabled={loading}
               type="button"
               onClick={(e) => {
@@ -232,27 +327,31 @@ function Add() {
                 dispatch({ type: "add", actionName: "addExtractType" });
               }}
             >
-              Add
+              Add Sub-Element Selector
             </Button>
           </div>
         </div>
-        {actions.length > 0 &&
-          actions.map((item) => {
-            return (
-              <ExtractElementInput
-                disabled={loading}
-                dispatch={dispatch}
-                state={actions}
-                key={item.uuid}
-                uuid={item.uuid}
-              />
-            );
-          })}
+        <section>
+          {actions.length > 0 &&
+            actions.map((item) => {
+              return (
+                <ExtractElementInput
+                  disabled={loading}
+                  dispatch={dispatch}
+                  state={actions}
+                  key={item.uuid}
+                  uuid={item.uuid}
+                />
+              );
+            })}
+        </section>
       </form>
-
       {/* Results container */}
-
-      <div className="space-y-4">
+      <div
+        className="mb-8 space-y-4"
+        id="results"
+        data-res={data[0] && data[0].result.length > 0 ? true : false}
+      >
         {data.length > 0 &&
           data.map((item) => {
             return (
@@ -260,33 +359,49 @@ function Add() {
                 key={crypto.randomUUID()}
                 className="w-full rounded-lg bg-blue-50 p-4 "
               >
-                {/* Results */}
-                <div className="border">
-                  {item.result.length > 0 ? (
-                    item.result.map((result: any) => {
-                      return (
-                        <div
-                          key={crypto.randomUUID()}
-                          className="flex gap-8 border p-2 text-lg"
-                        >
-                          <p>{options.selectorName}</p>
-                          {options.selectorType === "href" ? (
-                            <a href={result[options.selectorName]} className="">
-                              {result[options.selectorType]}
-                            </a>
-                          ) : (
-                            <>
-                              <p>{}</p>
-                              <p>{result[options.selectorType]}</p>
-                            </>
-                          )}
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <p>No data found</p>
-                  )}
-                </div>
+                {/* Results rows*/}
+
+                {item.result.length > 0 ? (
+                  <div className="space-y-4">
+                    {item.result.map((element: any) => {
+                      /* When subelements are present */
+
+                      if (actions.length > 0) {
+                        <div className="">
+                          {item.result.map((resultElement: any) => {
+                            return Object.keys(resultElement).map((key, i) => {
+                              // console.log(key, resultElement[key]);
+                              return (
+                                <div key={i} className="">
+                                  <p>{resultElement[key]}</p>
+                                  zzzzz
+                                </div>
+                              );
+                            });
+                          })}
+                        </div>;
+                      } else {
+                        /* when subelements are not present */
+
+                        return (
+                          <div
+                            key={crypto.randomUUID()}
+                            className="border-b border-foreground p-2"
+                          >
+                            <p className=" break-words">
+                              <strong className="mr-4">
+                                {options.selectorName}
+                              </strong>
+                              {element[options.selectorName]}
+                            </p>
+                          </div>
+                        );
+                      }
+                    })}
+                  </div>
+                ) : (
+                  <p>No data found</p>
+                )}
               </div>
             );
           })}
@@ -310,6 +425,7 @@ function reducer(state: typeof initialReducerState, action: reducerAction) {
               name: "",
               selector: "",
               type: "",
+              filter: "",
             },
           };
           return [...state, newElement];

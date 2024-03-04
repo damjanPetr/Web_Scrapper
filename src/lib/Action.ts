@@ -33,6 +33,7 @@ export abstract class Action {
     this.state.action = this.name;
   }
 }
+
 export class addTitleAction extends Action {
   public title: string;
   constructor(title: string) {
@@ -50,7 +51,7 @@ export class loadBrowserAction extends Action {
   }
   async execute() {
     this.state.browser = await puppeteer.launch({
-      headless: false,
+      headless: "shell",
     });
   }
 }
@@ -144,6 +145,7 @@ export class page$$ extends Action {
     }
   }
 }
+
 export class waitForSelector extends Action {
   private selector: string;
 
@@ -172,15 +174,17 @@ export class typeAction extends Action {
   }
 }
 export class addExtractTypeAction extends Action {
-  public selector: string = "";
-  public name: string;
-  public type: "textContent" | "href";
-  constructor(selector, name, type) {
+  constructor(
+    public selector: string = "",
+    public name: string,
+    public type: "textContent" | "href",
+    public filter: string = "",
+  ) {
     super();
     console.log("test", selector, name, type);
-    this.selector = selector;
-    this.name = name;
-    this.type = type;
+    // this.selector = selector;
+    // this.name = name;
+    // this.type = type;
   }
 
   async execute() {
@@ -189,9 +193,9 @@ export class addExtractTypeAction extends Action {
         name: this.name,
         selector: this.selector,
         type: this.type,
+        filter: this.filter,
       });
     }
-    console.log("huetonuhaont", this.state.extractParams);
   }
 }
 
@@ -205,50 +209,85 @@ export class evaluateElements extends Action {
      * a defined object with name, selector and type
      */
     const page = this.state.page;
-    const elementArray = this.state.elements;
+    const stateElements = this.state.elements;
 
-    const subElementSelectors = this.state.extractParams;
+    this.state.progress = 0;
+    const elementParameters = this.state.extractParams;
 
-    console.log(
-      "🚀 ✔ evaluateElements ✔ execute ✔ subElementSelectors:",
-      subElementSelectors,
-    );
+    // * clean result array
+    this.state.result = [];
 
-    if (elementArray)
-      for (let element of elementArray) {
-        if (subElementSelectors?.length > 0) {
-          const temp: { [key: string]: string } = {};
+    if (stateElements) {
+      //* Loop through dom elements from the state
+      for (let element of stateElements) {
+        if (elementParameters && elementParameters?.length > 0) {
+          const elementResultObj: { [key: string]: string } = {};
+
+          // * add normal selector parameter if
+          elementParameters.push({
+            name: this.state.info.selectorName,
+            selector: "",
+            type: this.state.info.selectorType,
+            filter: "",
+          });
+
           await new Promise((resolve, reject) => {
-            subElementSelectors.forEach(async ({ name, selector, type }) => {
+            //* Loop through array of objects with from parameters
+            async function handleElement({
+              name,
+              selector,
+              type,
+              filter,
+            }: NonNullable<typeof elementParameters>[number]) {
               const value = await page?.evaluate(
-                (innerElement: any, type, selector) => {
+                (innerElement: any, type, selector, filter) => {
                   if (selector === "") {
-                    console.log(innerElement[type]);
-                    return innerElement[type];
+                    // * if selector is empty, return the type data form the original element
+                    if (innerElement[type] != null) return innerElement[type];
+                    else return null;
                   } else {
+                    // * if selector is not empty return the type data targeted by the selector
                     const ele = innerElement.querySelector(selector);
+                    console.log(ele);
+                    if (ele == null) return null;
+                    if (filter !== "") {
+                      console.log(ele[type], filter, type);
+                      if (
+                        (ele[type] as string)
+                          .toLowerCase()
+                          .includes(filter.toLowerCase())
+                      ) {
+                        console.log("%c 'filter", "background: pink", true);
+                        return ele[type];
+                      } else {
+                        return null;
+                      }
+                    }
+
                     return ele[type];
                   }
                 },
                 element,
                 type,
                 selector,
+                filter,
               );
-              temp[name] = value;
-              resolve(value);
-            });
-          });
 
-          this.state.result.push(temp);
+              if (value === null) return resolve(null);
+              else {
+                elementResultObj[name] = value;
+                resolve(value);
+              }
+            }
+
+            elementParameters.forEach(handleElement);
+          });
+          if (Object.keys(elementResultObj).length != 0) {
+            this.state.result.push(elementResultObj);
+          }
         } else {
-          // const temp: { [key: string]: string } = {};
           const type = this.state.info.selectorType;
           const selectorName = this.state.info.selectorName;
-
-          console.log(
-            "🚀 ✔ evaluateElements ✔ execute ✔ selectorName:",
-            selectorName,
-          );
 
           const returnElement = await page?.evaluate(
             (innerElement: any, type) => {
@@ -257,13 +296,14 @@ export class evaluateElements extends Action {
             element,
             type,
           );
-          // temp[selectorName] = returnElement;
 
           this.state.result.push({
             [selectorName]: returnElement,
           });
         }
+        this.state.progress += (1 / stateElements.length) * 100;
       }
+    }
   }
 }
 
@@ -275,21 +315,16 @@ export class writeToCsv extends Action {
     // writeFileSync("./result.csv", JSON.stringify(this.state.result) + "\r", {
     //   flag: "a",
     // });
-
     // const data = this.state.result.map((obj) => {});
-    console.log(this.state.result);
+    // console.log(this.state.result);
   }
 }
 
-type AllHTMLElementProperties = {
-  [K in keyof HTMLElementTagNameMap]: HTMLElementTagNameMap[K];
-};
 export class printResultAction extends Action {
   constructor() {
     super();
   }
   async execute() {
-    // console.log(this.state.result);
     const info = [this.state.info.title, this.state.info.link];
 
     stringify(

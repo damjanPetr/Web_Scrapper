@@ -5,10 +5,11 @@ import { actionsType } from "../add/page";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
+
+  console.log("🚀 ✔ POST ✔ body:", body);
+
   const { link, title, selector, selectorName, selectorType } = body.options;
   const actions = body.actions;
-
-  console.log("🚀 ✔ POST ✔ actions:", body);
 
   const test = new Invoker();
 
@@ -18,12 +19,13 @@ export async function POST(request: NextRequest) {
 
   actions.forEach((action: actionsType) => {
     if (action.actionName == "addExtractType" && action.params !== null) {
-      console.log(action.params);
+      console.log("action.params", action.params);
       test.addAction(
         "addExtractType",
         action?.params.selector,
         action?.params.name,
         action?.params.type,
+        action?.params.filter,
       );
     }
   });
@@ -32,13 +34,38 @@ export async function POST(request: NextRequest) {
   test.addAction("page$$", selector, selectorType, selectorName);
   test.addAction("evaluateElements");
   // test.addAction("printResult");
-  await test.activate();
 
-  console.log(test.state.result);
-  const resData = {
-    result: test.state.result,
-  };
+  // const resData = {
+  //   result: test.state.result,
+  // };
+  // console.log(resData);
 
   // test.addToDatabase();
-  return new Response(JSON.stringify(resData));
+  return new Response(
+    new ReadableStream({
+      async start(controller) {
+        let done = false;
+        const interval = setInterval(() => {
+          const percent = test.state.progress;
+          try {
+            if (done === true) {
+              controller.enqueue(JSON.stringify({ result: test.state.result }));
+              // controller.enqueue(JSON.stringify(resData));
+              clearInterval(interval);
+              controller.close();
+            } else {
+              controller.enqueue(percent.toString());
+            }
+          } catch (err) {
+            if (err instanceof Error) console.log(err);
+          } finally {
+            clearInterval(interval);
+          }
+        }, 100);
+
+        await test.activate();
+      },
+    }),
+  );
+  // return new Response(JSON.stringify(resData));
 }
