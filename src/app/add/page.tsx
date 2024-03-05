@@ -2,6 +2,15 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Progress } from "@/components/ui/progress";
 import {
   Select,
@@ -49,7 +58,10 @@ const initialOptions = {
   selectorName: "",
 };
 
+const itemsPerPage = 10; // Number of items to display per page
+
 function Add() {
+  const [currentPage, setCurrentPage] = useState(1);
   const [actions, dispatch] = useReducer(reducer, initialReducerState);
   const id = useId();
   const [downBtnState, setDownBtnState] = useState(false);
@@ -107,43 +119,67 @@ function Add() {
         method: "POST",
         body: JSON.stringify(outputData),
       });
+      const reader = response.body?.getReader();
 
       while (true) {
-        const reader = response.body?.getReader();
-
         if (reader) {
           const { done, value } = await reader?.read();
-
           const chunk = new TextDecoder().decode(value);
 
           if (chunk.startsWith("{")) {
-            console.log("label", new TextDecoder().decode(value));
-            // const jsonData = JSON.parse(chunk);
-            // console.log(jsonData);
-            // setData([jsonData]);
+            const jsonData = JSON.parse(chunk);
+            console.log(jsonData);
+            setData([jsonData]);
           } else {
+            // console.log(chunk);
             setProgress(parseInt(chunk));
           }
 
           if (done) {
-            setProgress(0);
-            reader.cancel("cancelled");
+            reader.cancel();
             break;
           }
         }
-        reader?.releaseLock();
       }
     } catch (err) {
-      if (err instanceof Error) throw new Error(err.message);
+      if (err instanceof Error) {
+        throw new Error(err.message);
+      }
     } finally {
+      setProgress(0);
       setLoading(false);
       setCancelStream(false);
     }
+
+    setData(data.slice(0, 10));
   }
 
   return (
     <div>
-      {/* Down Button */}(
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              href="#"
+              onClick={() => setCurrentPage(currentPage - 1)}
+            />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#">{currentPage}</PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationEllipsis />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext
+              href="#"
+              onClick={() => setCurrentPage(currentPage + 1)}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+
+      {/* Down Button */}
       <button
         ref={downBtn}
         type="button"
@@ -159,10 +195,10 @@ function Add() {
           icon="mdi:arrow-up"
           width={30}
           height={30}
-          className="fixed bottom-10 right-10 rounded bg-violet-400 p-4 text-white "
+          className="fixed bottom-6 right-6 rounded bg-violet-400 p-4 text-white "
         />
       </button>
-      ){/* Form for initial selector input */}
+      {/* Form for initial selector input */}
       <form
         action=""
         onSubmit={handleSubmit}
@@ -287,14 +323,19 @@ function Add() {
                 </Button>
               )}
             </div>
+
             {loading && (
-              <div className="absolute inset-y-0 left-full ml-4 flex items-center text-white">
-                <Icon icon={"svg-spinners:wind-toy"} width={30} height={30} />
-                <label htmlFor="loadingProgress">Progress...</label>
+              <div className="absolute inset-y-0 left-full ml-4 flex items-center  justify-center gap-2 text-white ">
+                <Icon
+                  icon={"svg-spinners:wind-toy"}
+                  width={30}
+                  height={30}
+                  className=""
+                />
                 <Progress
                   id="loadingProgress"
-                  value={33}
-                  className="accent-green-400"
+                  value={progress}
+                  className=" w-28 transition-all"
                 />
                 {progress}%
               </div>
@@ -353,7 +394,7 @@ function Add() {
         data-res={data[0] && data[0].result.length > 0 ? true : false}
       >
         {data.length > 0 &&
-          data.map((item) => {
+          data.slice(0, 1).map((item) => {
             return (
               <div
                 key={crypto.randomUUID()}

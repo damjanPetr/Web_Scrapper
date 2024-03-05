@@ -69,14 +69,21 @@ export class Invoker implements addToDatabase {
     for (const { action, parameters } of this.actions) {
       try {
         const actionClass = new this.hashmap[action](...parameters);
+
         actionClass.setInvoker(this);
+
+        console.time(this.state.action!);
+
         await actionClass.execute();
+
+        console.timeEnd(this.state.action!);
       } catch (err) {
-        if (err instanceof Error) console.log(err);
+        if (err instanceof Error) throw new Error(err.message);
       }
     }
     this.onEnd?.setInvoker(this);
     await this.onEnd?.execute();
+    return;
   }
   listActions() {
     for (const action of this.actions) {

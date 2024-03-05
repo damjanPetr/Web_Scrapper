@@ -11,10 +11,10 @@ export async function POST(request: NextRequest) {
   const { link, title, selector, selectorName, selectorType } = body.options;
   const actions = body.actions;
 
-  const test = new Invoker();
+  let test = new Invoker();
 
   test.setOnStart(new loadBrowserAction());
-  test.setOnEnd(new closeBrowserAction());
+  // test.setOnEnd(new closeBrowserAction());
   test.addAction("openNewPage", link);
 
   actions.forEach((action: actionsType) => {
@@ -35,37 +35,26 @@ export async function POST(request: NextRequest) {
   test.addAction("evaluateElements");
   // test.addAction("printResult");
 
-  // const resData = {
-  //   result: test.state.result,
-  // };
-  // console.log(resData);
-
+  let done = false;
   // test.addToDatabase();
   return new Response(
     new ReadableStream({
       async start(controller) {
-        let done = false;
-        const interval = setInterval(() => {
+        const timer = setInterval(() => {
           const percent = test.state.progress;
-          try {
-            if (done === true) {
-              controller.enqueue(JSON.stringify({ result: test.state.result }));
-              // controller.enqueue(JSON.stringify(resData));
-              clearInterval(interval);
-              controller.close();
-            } else {
-              controller.enqueue(percent.toString());
-            }
-          } catch (err) {
-            if (err instanceof Error) console.log(err);
-          } finally {
-            clearInterval(interval);
-          }
-        }, 100);
 
+          controller.enqueue(percent.toString());
+          if (done) {
+            controller.enqueue(JSON.stringify({ result: test.state.result }));
+            clearInterval(timer);
+            controller.close();
+          }
+        }, 400);
         await test.activate();
+        done = true;
       },
     }),
   );
+
   // return new Response(JSON.stringify(resData));
 }

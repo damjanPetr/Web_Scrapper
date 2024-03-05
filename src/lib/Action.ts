@@ -51,7 +51,7 @@ export class loadBrowserAction extends Action {
   }
   async execute() {
     this.state.browser = await puppeteer.launch({
-      headless: "shell",
+      headless: false,
     });
   }
 }
@@ -132,7 +132,7 @@ export class page$$ extends Action {
   constructor(selector: string, selectorType: string, selectorName: string) {
     super();
     this.selectorType = selectorType;
-    console.log(this.selectorType);
+    // console.log(this.selectorType);
     this.selector = selector;
     this.selectorName = selectorName;
   }
@@ -214,6 +214,11 @@ export class evaluateElements extends Action {
     this.state.progress = 0;
     const elementParameters = this.state.extractParams;
 
+    console.log(
+      "evaluateElements 🟦 execute 🟦 elementParameters:",
+      elementParameters,
+    );
+
     // * clean result array
     this.state.result = [];
 
@@ -223,16 +228,16 @@ export class evaluateElements extends Action {
         if (elementParameters && elementParameters?.length > 0) {
           const elementResultObj: { [key: string]: string } = {};
 
-          // * add normal selector parameter if
-          elementParameters.push({
-            name: this.state.info.selectorName,
-            selector: "",
-            type: this.state.info.selectorType,
-            filter: "",
-          });
+          // // * add normal selector parameter if
+          // elementParameters.push({
+          //   name: this.state.info.selectorName,
+          //   selector: "",
+          //   type: this.state.info.selectorType,
+          //   filter: "",
+          // });
 
           await new Promise((resolve, reject) => {
-            //* Loop through array of objects with from parameters
+            //* Callback fn for Loop through array of parameters
             async function handleElement({
               name,
               selector,
@@ -242,7 +247,7 @@ export class evaluateElements extends Action {
               const value = await page?.evaluate(
                 (innerElement: any, type, selector, filter) => {
                   if (selector === "") {
-                    // * if selector is empty, return the type data form the original element
+                    // * if selector is empty, return the type data from the original element
                     if (innerElement[type] != null) return innerElement[type];
                     else return null;
                   } else {
@@ -257,14 +262,14 @@ export class evaluateElements extends Action {
                           .toLowerCase()
                           .includes(filter.toLowerCase())
                       ) {
-                        console.log("%c 'filter", "background: pink", true);
+                        console.log("%c 'filter", "background: black", true);
                         return ele[type];
                       } else {
                         return null;
                       }
+                    } else {
+                      return ele[type];
                     }
-
-                    return ele[type];
                   }
                 },
                 element,
@@ -273,8 +278,10 @@ export class evaluateElements extends Action {
                 filter,
               );
 
-              if (value === null) return resolve(null);
-              else {
+              if (value === null) {
+                elementResultObj[name] = "";
+                return resolve(null);
+              } else {
                 elementResultObj[name] = value;
                 resolve(value);
               }
