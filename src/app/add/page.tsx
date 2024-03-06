@@ -62,12 +62,36 @@ const itemsPerPage = 10; // Number of items to display per page
 
 function Add() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [actions, dispatch] = useReducer(reducer, initialReducerState);
-  const id = useId();
   const [downBtnState, setDownBtnState] = useState(false);
-
   const [cancelStream, setCancelStream] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<
+    {
+      link: string;
+      title: string;
+      [key: string]: any;
+    }[]
+  >([]);
+  const [options, setOptions] = useState<{
+    title: string;
+    link: string;
+    selector: string;
+    selectorName: string;
+    selectorType: string;
+  }>(initialOptions);
+
+  const [actions, dispatch] = useReducer(reducer, initialReducerState);
+
+  const id = useId();
+
   const downBtn = useRef(null);
+
+  const startIndex = (currentPage - 1) * itemsPerPage; //  Start index of items
+  const endIndex = itemsPerPage * currentPage; // End index of items
+
+  const totalPages = Math.ceil(data[0]?.result?.length / itemsPerPage);
+  const shadowSize = 2;
 
   //* Scroll down button
   useEffect(() => {
@@ -81,25 +105,6 @@ function Add() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
-  const [progress, setProgress] = useState(0);
-  const [loading, setLoading] = useState(false);
-
-  const [data, setData] = useState<
-    {
-      link: string;
-      title: string;
-      [key: string]: any;
-    }[]
-  >([]);
-
-  const [options, setOptions] = useState<{
-    title: string;
-    link: string;
-    selector: string;
-    selectorName: string;
-    selectorType: string;
-  }>(initialOptions);
 
   async function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
     try {
@@ -131,7 +136,6 @@ function Add() {
             console.log(jsonData);
             setData([jsonData]);
           } else {
-            // console.log(chunk);
             setProgress(parseInt(chunk));
           }
 
@@ -150,35 +154,10 @@ function Add() {
       setLoading(false);
       setCancelStream(false);
     }
-
-    setData(data.slice(0, 10));
   }
 
   return (
     <div>
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href="#"
-              onClick={() => setCurrentPage(currentPage - 1)}
-            />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">{currentPage}</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext
-              href="#"
-              onClick={() => setCurrentPage(currentPage + 1)}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-
       {/* Down Button */}
       <button
         ref={downBtn}
@@ -394,51 +373,61 @@ function Add() {
         data-res={data[0] && data[0].result.length > 0 ? true : false}
       >
         {data.length > 0 &&
-          data.slice(0, 1).map((item) => {
+          data.map((item) => {
             return (
               <div
                 key={crypto.randomUUID()}
                 className="w-full rounded-lg bg-blue-50 p-4 "
               >
+                <div className="flex items-center justify-between bg-primary">
+                  <p className="text-primary-foreground">
+                    {item.result.length} results
+                  </p>
+                </div>
                 {/* Results rows*/}
 
                 {item.result.length > 0 ? (
                   <div className="space-y-4">
-                    {item.result.map((element: any) => {
-                      /* When subelements are present */
+                    {item.result
+                      .slice(startIndex, endIndex)
+                      .map((element: any) => {
+                        /* When subelements are present */
 
-                      if (actions.length > 0) {
-                        <div className="">
-                          {item.result.map((resultElement: any) => {
-                            return Object.keys(resultElement).map((key, i) => {
-                              // console.log(key, resultElement[key]);
-                              return (
-                                <div key={i} className="">
-                                  <p>{resultElement[key]}</p>
-                                  zzzzz
-                                </div>
+                        if (actions.length > 0) {
+                          <div className="">
+                            {item.result.map((resultElement: any) => {
+                              return Object.keys(resultElement).map(
+                                (key, i) => {
+                                  // console.log(key, resultElement[key]);
+                                  return (
+                                    <div key={i} className="">
+                                      <p>{resultElement[key]}</p>
+                                      zzzzz
+                                    </div>
+                                  );
+                                },
                               );
-                            });
-                          })}
-                        </div>;
-                      } else {
-                        /* when subelements are not present */
+                            })}
+                          </div>;
+                        } else {
+                          /* when subelements are not present */
 
-                        return (
-                          <div
-                            key={crypto.randomUUID()}
-                            className="border-b border-foreground p-2"
-                          >
-                            <p className=" break-words">
-                              <strong className="mr-4">
-                                {options.selectorName}
-                              </strong>
-                              {element[options.selectorName]}
-                            </p>
-                          </div>
-                        );
-                      }
-                    })}
+                          return (
+                            <div
+                              key={crypto.randomUUID()}
+                              className="border-b border-foreground p-2"
+                            >
+                              <p className=" break-words">
+                                <strong className="mr-4">
+                                  {options.selectorName}
+                                </strong>
+
+                                {element[options.selectorName]}
+                              </p>
+                            </div>
+                          );
+                        }
+                      })}
                   </div>
                 ) : (
                   <p>No data found</p>
@@ -446,6 +435,59 @@ function Add() {
               </div>
             );
           })}
+      </div>
+      <div>
+        <Pagination>
+          <PaginationContent className="ml-auto mr-2">
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() =>
+                  setCurrentPage((prevPage) =>
+                    Math.max(prevPage - shadowSize, 1),
+                  )
+                }
+              />
+            </PaginationItem>
+            <PaginationItem>
+              {data &&
+                data.length > 0 &&
+                Array.from(
+                  { length: Math.min(totalPages, shadowSize * 2 + 1) },
+                  (_, i) => currentPage - shadowSize + i,
+                )
+                  .filter((page) => page > 0 && page <= totalPages)
+                  .map((item, i) => {
+                    return (
+                      <PaginationLink
+                        key={i}
+                        className={currentPage === item ? "font-extrabold" : ""}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(item);
+                        }}
+                      >
+                        {item}
+                      </PaginationLink>
+                    );
+                  })}
+            </PaginationItem>
+
+            {currentPage < totalPages && (
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            )}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() =>
+                  setCurrentPage((prevPage) =>
+                    Math.min(prevPage + 1, totalPages),
+                  )
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );

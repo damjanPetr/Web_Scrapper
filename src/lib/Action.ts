@@ -51,7 +51,7 @@ export class loadBrowserAction extends Action {
   }
   async execute() {
     this.state.browser = await puppeteer.launch({
-      headless: false,
+      headless: "shell",
     });
   }
 }
