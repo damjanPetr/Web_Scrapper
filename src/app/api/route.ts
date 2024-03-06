@@ -50,8 +50,10 @@ export async function POST(request: NextRequest) {
             clearInterval(timer);
             controller.close();
           }
+          console.log("💢");
         }, 400);
         await test.activate();
+        console.log(test.state.result.at(-1));
         done = true;
       },
     }),

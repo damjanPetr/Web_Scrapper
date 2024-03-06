@@ -227,14 +227,7 @@ export class evaluateElements extends Action {
       for (let element of stateElements) {
         if (elementParameters && elementParameters?.length > 0) {
           const elementResultObj: { [key: string]: string } = {};
-
-          // // * add normal selector parameter if
-          // elementParameters.push({
-          //   name: this.state.info.selectorName,
-          //   selector: "",
-          //   type: this.state.info.selectorType,
-          //   filter: "",
-          // });
+          let deleteFlag = false;
 
           await new Promise((resolve, reject) => {
             //* Callback fn for Loop through array of parameters
@@ -246,50 +239,67 @@ export class evaluateElements extends Action {
             }: NonNullable<typeof elementParameters>[number]) {
               const value = await page?.evaluate(
                 (innerElement: any, type, selector, filter) => {
-                  if (selector === "") {
-                    // * if selector is empty, return the type data from the original element
-                    if (innerElement[type] != null) return innerElement[type];
-                    else return null;
-                  } else {
-                    // * if selector is not empty return the type data targeted by the selector
+                  if (selector === "" && filter === "") {
+                    return innerElement[type];
+                  }
+
+                  if (selector === "" && filter !== "") {
+                    if (
+                      innerElement[type] != null &&
+                      (innerElement[type] as string)
+                        .toLowerCase()
+                        .includes(filter.toLowerCase())
+                    ) {
+                      console.log("%c 'filter", "background: black", true);
+                      return innerElement[type];
+                    }
+                    return null;
+                  }
+
+                  if (selector !== "" && filter === "") {
                     const ele = innerElement.querySelector(selector);
+                    if (!ele) return null;
                     console.log(ele);
-                    if (ele == null) return null;
-                    if (filter !== "") {
-                      console.log(ele[type], filter, type);
-                      if (
-                        (ele[type] as string)
-                          .toLowerCase()
-                          .includes(filter.toLowerCase())
-                      ) {
-                        console.log("%c 'filter", "background: black", true);
-                        return ele[type];
-                      } else {
-                        return null;
-                      }
-                    } else {
+                    return ele[type];
+                  }
+
+                  if (selector !== "" && filter !== "") {
+                    const ele = innerElement.querySelector(selector);
+                    console.log(ele[type], filter, type);
+                    if (
+                      ele[type] != null &&
+                      (ele[type] as string)
+                        .toLowerCase()
+                        .includes(filter.toLowerCase())
+                    ) {
+                      console.log("%c 'filter", "background: black", true);
                       return ele[type];
                     }
+
+                    return null;
                   }
                 },
                 element,
                 type,
                 selector,
                 filter,
+                deleteFlag,
               );
 
-              if (value === null) {
-                elementResultObj[name] = "";
-                return resolve(null);
-              } else {
-                elementResultObj[name] = value;
-                resolve(value);
+              if (value == null) {
+                deleteFlag = true;
               }
+              if (value != null) {
+                elementResultObj[name] = value;
+              }
+
+              resolve(value);
             }
 
             elementParameters.forEach(handleElement);
           });
-          if (Object.keys(elementResultObj).length != 0) {
+
+          if (Object.keys(elementResultObj).length != 0 && !deleteFlag) {
             this.state.result.push(elementResultObj);
           }
         } else {

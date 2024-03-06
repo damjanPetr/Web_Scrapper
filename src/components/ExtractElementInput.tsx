@@ -9,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Switch } from "@/components/ui/switch";
 
 export type Props = {
   state: actionsType[];
@@ -26,6 +27,7 @@ const initialState = {
 function ExtractElementInput({ dispatch, uuid, state, disabled }: Props) {
   const id = useId();
 
+  const [parent, setParent] = useState(true);
   const [data, setData] = useState(initialState);
   const [added, setAdded] = useState(false);
 
@@ -58,12 +60,38 @@ function ExtractElementInput({ dispatch, uuid, state, disabled }: Props) {
         </div>
 
         <div className="space-y-4 ">
-          <Label htmlFor={id + `page$$`} className="text-lg text-white ">
-            Css Selector
-          </Label>
+          <div className="flex items-center justify-between  text-white ">
+            <Label
+              htmlFor={id + `page$$`}
+              className={`p-1 transition-all ${!parent ? "rounded bg-green-400/40  font-semibold" : ""}`}
+            >
+              Css Selector
+            </Label>
+            <Switch
+              className="scale-75"
+              checked={parent}
+              onClick={() => {
+                if (!parent) {
+                  setData({ ...data, selector: "" });
+                }
+                if (!data.selector) {
+                  setData({ ...data, selector: "" });
+                }
+
+                setParent(!parent);
+              }}
+            />
+            <p
+              className={`p-1 transition-all ${parent ? "rounded bg-green-400/40  font-semibold" : ""}`}
+            >
+              Parent
+            </p>
+          </div>
           <Input
             type="text"
             className="text-xl placeholder:text-lg  placeholder:text-gray-400"
+            disabled={parent}
+            value={data.selector}
             placeholder="e.g. h1 > div"
             onChange={(e) => {
               setData({ ...data, selector: e.target.value });

@@ -93,6 +93,13 @@ function Add() {
   const totalPages = Math.ceil(data[0]?.result?.length / itemsPerPage);
   const shadowSize = 2;
 
+  function setNextPage() {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+  }
+  function setPrevPage() {
+    setCurrentPage((prevPage) => Math.max(prevPage - shadowSize, 1));
+  }
+
   //* Scroll down button
   useEffect(() => {
     const handleScroll = () => {
@@ -101,6 +108,7 @@ function Add() {
     };
 
     window.addEventListener("scroll", handleScroll);
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -151,6 +159,7 @@ function Add() {
       }
     } finally {
       setProgress(0);
+      setCurrentPage(1);
       setLoading(false);
       setCancelStream(false);
     }
@@ -377,11 +386,14 @@ function Add() {
             return (
               <div
                 key={crypto.randomUUID()}
-                className="w-full rounded-lg bg-blue-50 p-4 "
+                className="w-full rounded-lg bg-blue-50 p-4"
               >
-                <div className="flex items-center justify-between bg-primary">
-                  <p className="text-primary-foreground">
-                    {item.result.length} results
+                <div className="flex items-center justify-between p-2 ">
+                  <p className="text-lg text-secondary-foreground">
+                    <span className="mr-4 text-xl font-medium">
+                      {item.result.length}
+                    </span>{" "}
+                    results
                   </p>
                 </div>
                 {/* Results rows*/}
@@ -392,26 +404,25 @@ function Add() {
                       .slice(startIndex, endIndex)
                       .map((element: any) => {
                         /* When subelements are present */
-
                         if (actions.length > 0) {
-                          <div className="">
-                            {item.result.map((resultElement: any) => {
-                              return Object.keys(resultElement).map(
-                                (key, i) => {
-                                  // console.log(key, resultElement[key]);
-                                  return (
-                                    <div key={i} className="">
-                                      <p>{resultElement[key]}</p>
-                                      zzzzz
-                                    </div>
-                                  );
-                                },
-                              );
-                            })}
-                          </div>;
+                          return (
+                            <div className="" key={crypto.randomUUID()}>
+                              {Object.keys(element).map((key) => {
+                                return (
+                                  <div key={crypto.randomUUID()} className="">
+                                    <p>
+                                      <span className="mr-4 font-bold">
+                                        {key}
+                                      </span>
+                                      {element[key]}
+                                    </p>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
                         } else {
                           /* when subelements are not present */
-
                           return (
                             <div
                               key={crypto.randomUUID()}
@@ -437,57 +448,51 @@ function Add() {
           })}
       </div>
       <div>
-        <Pagination>
-          <PaginationContent className="ml-auto mr-2">
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() =>
-                  setCurrentPage((prevPage) =>
-                    Math.max(prevPage - shadowSize, 1),
-                  )
-                }
-              />
-            </PaginationItem>
-            <PaginationItem>
-              {data &&
-                data.length > 0 &&
-                Array.from(
-                  { length: Math.min(totalPages, shadowSize * 2 + 1) },
-                  (_, i) => currentPage - shadowSize + i,
-                )
-                  .filter((page) => page > 0 && page <= totalPages)
-                  .map((item, i) => {
-                    return (
-                      <PaginationLink
-                        key={i}
-                        className={currentPage === item ? "font-extrabold" : ""}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCurrentPage(item);
-                        }}
-                      >
-                        {item}
-                      </PaginationLink>
-                    );
-                  })}
-            </PaginationItem>
-
-            {currentPage < totalPages && (
+        {data.length > 0 && (
+          <Pagination>
+            <PaginationContent className="ml-auto mr-2">
               <PaginationItem>
-                <PaginationEllipsis />
+                <PaginationPrevious onClick={() => setPrevPage()} />
               </PaginationItem>
-            )}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() =>
-                  setCurrentPage((prevPage) =>
-                    Math.min(prevPage + 1, totalPages),
+              <PaginationItem>
+                {data &&
+                  data.length > 0 &&
+                  Array.from(
+                    { length: Math.min(totalPages, shadowSize * 2 + 1) },
+                    (_, i) => currentPage - shadowSize + i,
                   )
-                }
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+                    .filter((page) => page > 0 && page <= totalPages)
+                    .map((item, i) => {
+                      return (
+                        <PaginationLink
+                          key={i}
+                          className={
+                            currentPage === item
+                              ? "bg-secondary/50 font-extrabold"
+                              : ""
+                          }
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(item);
+                          }}
+                        >
+                          {item}
+                        </PaginationLink>
+                      );
+                    })}
+              </PaginationItem>
+
+              {currentPage < totalPages && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+              <PaginationItem>
+                <PaginationNext onClick={() => setNextPage()} />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
     </div>
   );
