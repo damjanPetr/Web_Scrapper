@@ -1,20 +1,22 @@
 import { Input } from "@/components/ui/input";
-import { Icon } from "@iconify-icon/react";
-import { useId, useState } from "react";
-import { actionsType, reducerAction } from "../app/add/page";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Icon } from "@iconify-icon/react";
+import { useEffect, useId, useState } from "react";
+import { actionsType, reducerAction } from "../app/add/page";
 
 export type Props = {
   state: actionsType[];
   uuid: string;
   dispatch: (arg: reducerAction) => void;
   disabled: boolean;
+  enabled: boolean;
 };
 
 const initialState = {
@@ -23,23 +25,36 @@ const initialState = {
   type: "href",
   filter: "",
 };
-function ExtractElementInput({ dispatch, uuid, state, disabled }: Props) {
+function ExtractElementInput({
+  dispatch,
+  uuid,
+  state,
+  disabled,
+  enabled,
+}: Props) {
   const id = useId();
 
+  const [parent, setParent] = useState(true);
   const [data, setData] = useState(initialState);
-  const [added, setAdded] = useState(false);
 
+  useEffect(() => {
+    dispatch({
+      payload: data,
+      type: "update",
+      uuid,
+    });
+  }, [data, dispatch, uuid]);
   return (
     <fieldset
       disabled={disabled}
-      className={`relative rounded p-2 transition-colors ${added && "bg-green-500/50"}`}
+      className={`relative rounded p-2 transition-colors ${enabled && "bg-green-500/50"}`}
     >
-      {added && (
+      {enabled && (
         <div className="absolute  right-0 top-0   rounded-bl border-b-2 border-l-2 border-green-100 bg-green-500/60 p-2 font-bold text-white ">
           Enabled
         </div>
       )}
-      <div className={`flex gap-8  rounded ${added ? "" : ""}`}>
+      <div className={`flex gap-8  rounded ${enabled ? "" : ""}`}>
         <div className="space-y-4 ">
           <Label htmlFor={id + "selectorName"} className="text-lg text-white ">
             Name
@@ -58,12 +73,38 @@ function ExtractElementInput({ dispatch, uuid, state, disabled }: Props) {
         </div>
 
         <div className="space-y-4 ">
-          <Label htmlFor={id + `page$$`} className="text-lg text-white ">
-            Css Selector
-          </Label>
+          <div className="flex items-center justify-between  text-white ">
+            <Label
+              htmlFor={id + `page$$`}
+              className={`p-1 transition-all ${!parent ? "rounded bg-green-400/40  font-semibold" : ""}`}
+            >
+              Css Selector
+            </Label>
+            <Switch
+              className="scale-75"
+              checked={parent}
+              onClick={() => {
+                if (!parent) {
+                  setData({ ...data, selector: "" });
+                }
+                if (!data.selector) {
+                  setData({ ...data, selector: "" });
+                }
+
+                setParent(!parent);
+              }}
+            />
+            <p
+              className={`p-1 transition-all ${parent ? "rounded bg-green-400/40  font-semibold" : ""}`}
+            >
+              Parent
+            </p>
+          </div>
           <Input
             type="text"
             className="text-xl placeholder:text-lg  placeholder:text-gray-400"
+            disabled={parent}
+            value={data.selector}
             placeholder="e.g. h1 > div"
             onChange={(e) => {
               setData({ ...data, selector: e.target.value });
@@ -134,18 +175,14 @@ function ExtractElementInput({ dispatch, uuid, state, disabled }: Props) {
 
         <div className="flex items-end justify-between gap-8 ">
           <Icon
-            icon={added ? "carbon:checkmark-filled" : "mdi:plus"}
+            icon={enabled ? "carbon:checkmark-filled" : "mdi:plus"}
             tabIndex={0}
             width={24}
             height={24}
-            className={`bubble   rounded-md  p-0.5   ${added ? "test_color_mod2" : "test_color_mod1"}`}
+            className={`bubble   rounded-md  p-0.5   ${enabled ? "test_color_mod2" : "test_color_mod1"}`}
             onClick={() => {
-              setAdded(!added);
-              dispatch({
-                payload: data,
-                type: "update",
-                uuid,
-              });
+              // setEnabled(!enabled);
+              dispatch({ type: "toggle", uuid: uuid });
             }}
           />
           <Icon

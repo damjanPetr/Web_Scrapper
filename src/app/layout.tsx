@@ -24,11 +24,11 @@ export default function RootLayout({
       <body className={`${source_sans_3.className} `}>
         <Navbar />
         <main className="mx-auto min-h-svh max-w-screen-xl">{children}</main>
-        <footer className="bg-gradient-to-tr from-primary to-secondary p-4">
+        <footer className="mt-10 bg-gradient-to-tr from-primary to-secondary p-4">
           <div className="mx-auto max-w-screen-xl">
-            <p className="text-center text-primary-foreground">Test</p>
+            <p className="text-center text-primary-foreground">Footer</p>
           </div>
-        </footer>{" "}
+        </footer>
       </body>
     </html>
   );

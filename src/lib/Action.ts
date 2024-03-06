@@ -5,7 +5,6 @@ import { State } from "./State";
 import { stringify } from "csv";
 import { writeFileSync } from "fs";
 import puppeteer from "puppeteer";
-import db from "../database/Database";
 import { Invoker } from "./Invoker";
 
 // puppeteer.use(StealthPluggin());
@@ -132,7 +131,7 @@ export class page$$ extends Action {
   constructor(selector: string, selectorType: string, selectorName: string) {
     super();
     this.selectorType = selectorType;
-    console.log(this.selectorType);
+    // console.log(this.selectorType);
     this.selector = selector;
     this.selectorName = selectorName;
   }
@@ -223,48 +222,73 @@ export class evaluateElements extends Action {
         if (elementParameters && elementParameters?.length > 0) {
           const elementResultObj: { [key: string]: string } = {};
 
-          // * add normal selector parameter if
-          elementParameters.push({
-            name: this.state.info.selectorName,
-            selector: "",
-            type: this.state.info.selectorType,
-            filter: "",
-          });
+          let deleteFlag = false;
 
-          await new Promise((resolve, reject) => {
-            //* Loop through array of objects with from parameters
+          const promise = await new Promise((resolve, reject) => {
+            // if (deleteFlag) resolve(null);
+            elementParameters.forEach(handleElement);
+
+            //* Callback fn for Loop through array of parameters
             async function handleElement({
               name,
               selector,
               type,
               filter,
             }: NonNullable<typeof elementParameters>[number]) {
+              // console.log("params", name, selector, type, filter);
+
+              // deleteFlag = false;
               const value = await page?.evaluate(
                 (innerElement: any, type, selector, filter) => {
-                  if (selector === "") {
-                    // * if selector is empty, return the type data form the original element
-                    if (innerElement[type] != null) return innerElement[type];
-                    else return null;
-                  } else {
-                    // * if selector is not empty return the type data targeted by the selector
-                    const ele = innerElement.querySelector(selector);
-                    console.log(ele);
-                    if (ele == null) return null;
-                    if (filter !== "") {
-                      console.log(ele[type], filter, type);
-                      if (
-                        (ele[type] as string)
-                          .toLowerCase()
-                          .includes(filter.toLowerCase())
-                      ) {
-                        console.log("%c 'filter", "background: pink", true);
-                        return ele[type];
-                      } else {
-                        return null;
-                      }
+                  if (selector === "" && filter === "") {
+                    if (innerElement[type] == null) return null;
+                    console.log(
+                      "%c 'filter",
+                      "background: cyan",
+                      innerElement[type],
+                    );
+                    return innerElement[type];
+                  }
+
+                  if (selector === "" && filter !== "") {
+                    if (
+                      innerElement[type] != null &&
+                      (innerElement[type] as string)
+                        .toLowerCase()
+                        .includes(filter.toLowerCase())
+                    ) {
+                      console.log(
+                        "%c 'filter",
+                        "background: blue",
+                        innerElement[type],
+                      );
+                      return innerElement[type];
                     }
+                    return null;
+                  }
+
+                  if (selector !== "" && filter === "") {
+                    const ele = innerElement.querySelector(selector);
+                    if (!ele) return null;
+
+                    console.log("%c 'filter", "background: pink", ele[type]);
 
                     return ele[type];
+                  }
+
+                  if (selector !== "" && filter !== "") {
+                    const ele = innerElement.querySelector(selector);
+                    if (!ele) return null;
+
+                    if (
+                      ele[type] != null &&
+                      (ele[type] as string)
+                        .toLowerCase()
+                        .includes(filter.toLowerCase())
+                    ) {
+                      console.log("%c 'filter", "background: green", ele[type]);
+                      return ele[type];
+                    }
                   }
                 },
                 element,
@@ -273,18 +297,20 @@ export class evaluateElements extends Action {
                 filter,
               );
 
-              if (value === null) return resolve(null);
-              else {
+              if (value == null) {
+                deleteFlag = true;
+              }
+              if (value != null) {
                 elementResultObj[name] = value;
-                resolve(value);
               }
             }
-
-            elementParameters.forEach(handleElement);
+            if (deleteFlag) resolve(null);
+            else resolve(elementResultObj);
           });
-          if (Object.keys(elementResultObj).length != 0) {
-            this.state.result.push(elementResultObj);
-          }
+
+          console.log(promise);
+          if (!deleteFlag) this.state.result.push(promise);
+          // }
         } else {
           const type = this.state.info.selectorType;
           const selectorName = this.state.info.selectorName;

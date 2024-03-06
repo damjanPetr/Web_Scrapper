@@ -6,12 +6,12 @@ import { actionsType } from "../add/page";
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  console.log("🚀 ✔ POST ✔ body:", body);
+  // console.log("🚀 ✔ POST ✔ body:", body);
 
   const { link, title, selector, selectorName, selectorType } = body.options;
   const actions = body.actions;
 
-  const test = new Invoker();
+  let test = new Invoker();
 
   test.setOnStart(new loadBrowserAction());
   test.setOnEnd(new closeBrowserAction());
@@ -35,37 +35,36 @@ export async function POST(request: NextRequest) {
   test.addAction("evaluateElements");
   // test.addAction("printResult");
 
-  // const resData = {
-  //   result: test.state.result,
-  // };
-  // console.log(resData);
+  let done = false;
 
   // test.addToDatabase();
   return new Response(
     new ReadableStream({
       async start(controller) {
-        let done = false;
-        const interval = setInterval(() => {
-          const percent = test.state.progress;
+        const timer = setInterval(() => {
           try {
-            if (done === true) {
-              controller.enqueue(JSON.stringify({ result: test.state.result }));
-              // controller.enqueue(JSON.stringify(resData));
-              clearInterval(interval);
-              controller.close();
-            } else {
-              controller.enqueue(percent.toString());
-            }
-          } catch (err) {
-            if (err instanceof Error) console.log(err);
-          } finally {
-            clearInterval(interval);
-          }
-        }, 100);
+            const percent = test.state.progress;
 
+            controller.enqueue(percent.toString());
+            if (done) {
+              controller.enqueue(JSON.stringify({ result: test.state.result }));
+              clearInterval(timer);
+              controller.close();
+            }
+            console.log("💢");
+          } catch (e) {
+            clearInterval(timer);
+            controller.close();
+          }
+        }, 400);
         await test.activate();
+        console.log(test.state.result.at(-1));
+        done = true;
+        // clearInterval(timer);
+        // controller.close();
       },
     }),
   );
+
   // return new Response(JSON.stringify(resData));
 }
