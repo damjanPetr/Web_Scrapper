@@ -39,11 +39,16 @@ export type reducerAction =
   | {
       type: "add";
       actionName: actionsType["actionName"];
+    }
+  | {
+      type: "toggle";
+      uuid: string;
     };
 
 export type actionsType = {
   uuid: string;
   actionName: "addExtractType" | "openNewPage";
+  enabled: boolean;
   params: {
     [key: string]: string;
   } | null;
@@ -121,9 +126,8 @@ function Add() {
       setLoading(true);
       const outputData = {
         options,
-        actions,
+        actions: actions.filter((action) => action.enabled),
       };
-
       console.log(outputData);
       const response = await fetch(process.env.BASE_URL + "/api", {
         headers: {
@@ -366,6 +370,7 @@ function Add() {
               return (
                 <ExtractElementInput
                   disabled={loading}
+                  enabled={item.enabled}
                   dispatch={dispatch}
                   state={actions}
                   key={item.uuid}
@@ -410,7 +415,7 @@ function Add() {
                               {Object.keys(element).map((key) => {
                                 return (
                                   <div key={crypto.randomUUID()} className="">
-                                    <p>
+                                    <p className="line-clamp-3">
                                       <span className="mr-4 font-bold">
                                         {key}
                                       </span>
@@ -509,6 +514,7 @@ function reducer(state: typeof initialReducerState, action: reducerAction) {
           const newElement = {
             uuid: crypto.randomUUID(),
             actionName: action.actionName,
+            enabled: true,
             params: {
               name: "",
               selector: "",
@@ -522,6 +528,7 @@ function reducer(state: typeof initialReducerState, action: reducerAction) {
           return state;
       }
     }
+
     case "remove": {
       const newArray = state.filter((element) => element.uuid !== action.uuid);
       return newArray;
@@ -530,6 +537,17 @@ function reducer(state: typeof initialReducerState, action: reducerAction) {
       const newArray = state.map((element) => {
         if (element.uuid === action.uuid) {
           return { ...element, params: { ...action.payload } };
+        } else {
+          return element;
+        }
+      });
+      return newArray;
+    }
+
+    case "toggle": {
+      const newArray = state.map((element) => {
+        if (element.uuid === action.uuid) {
+          return { ...element, enabled: !element.enabled };
         } else {
           return element;
         }

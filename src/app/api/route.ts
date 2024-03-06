@@ -6,7 +6,7 @@ import { actionsType } from "../add/page";
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  console.log("🚀 ✔ POST ✔ body:", body);
+  // console.log("🚀 ✔ POST ✔ body:", body);
 
   const { link, title, selector, selectorName, selectorType } = body.options;
   const actions = body.actions;
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   let test = new Invoker();
 
   test.setOnStart(new loadBrowserAction());
-  // test.setOnEnd(new closeBrowserAction());
+  test.setOnEnd(new closeBrowserAction());
   test.addAction("openNewPage", link);
 
   actions.forEach((action: actionsType) => {
@@ -42,19 +42,26 @@ export async function POST(request: NextRequest) {
     new ReadableStream({
       async start(controller) {
         const timer = setInterval(() => {
-          const percent = test.state.progress;
+          try {
+            const percent = test.state.progress;
 
-          controller.enqueue(percent.toString());
-          if (done) {
-            controller.enqueue(JSON.stringify({ result: test.state.result }));
+            controller.enqueue(percent.toString());
+            if (done) {
+              controller.enqueue(JSON.stringify({ result: test.state.result }));
+              clearInterval(timer);
+              controller.close();
+            }
+            console.log("💢");
+          } catch (e) {
             clearInterval(timer);
             controller.close();
           }
-          console.log("💢");
         }, 400);
         await test.activate();
         console.log(test.state.result.at(-1));
         done = true;
+        // clearInterval(timer);
+        // controller.close();
       },
     }),
   );

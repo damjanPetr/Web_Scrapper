@@ -5,7 +5,6 @@ import { State } from "./State";
 import { stringify } from "csv";
 import { writeFileSync } from "fs";
 import puppeteer from "puppeteer";
-import db from "../database/Database";
 import { Invoker } from "./Invoker";
 
 // puppeteer.use(StealthPluggin());
@@ -214,11 +213,6 @@ export class evaluateElements extends Action {
     this.state.progress = 0;
     const elementParameters = this.state.extractParams;
 
-    console.log(
-      "evaluateElements 🟦 execute 🟦 elementParameters:",
-      elementParameters,
-    );
-
     // * clean result array
     this.state.result = [];
 
@@ -227,9 +221,13 @@ export class evaluateElements extends Action {
       for (let element of stateElements) {
         if (elementParameters && elementParameters?.length > 0) {
           const elementResultObj: { [key: string]: string } = {};
+
           let deleteFlag = false;
 
-          await new Promise((resolve, reject) => {
+          const promise = await new Promise((resolve, reject) => {
+            // if (deleteFlag) resolve(null);
+            elementParameters.forEach(handleElement);
+
             //* Callback fn for Loop through array of parameters
             async function handleElement({
               name,
@@ -237,9 +235,18 @@ export class evaluateElements extends Action {
               type,
               filter,
             }: NonNullable<typeof elementParameters>[number]) {
+              // console.log("params", name, selector, type, filter);
+
+              // deleteFlag = false;
               const value = await page?.evaluate(
                 (innerElement: any, type, selector, filter) => {
                   if (selector === "" && filter === "") {
+                    if (innerElement[type] == null) return null;
+                    console.log(
+                      "%c 'filter",
+                      "background: cyan",
+                      innerElement[type],
+                    );
                     return innerElement[type];
                   }
 
@@ -250,7 +257,11 @@ export class evaluateElements extends Action {
                         .toLowerCase()
                         .includes(filter.toLowerCase())
                     ) {
-                      console.log("%c 'filter", "background: black", true);
+                      console.log(
+                        "%c 'filter",
+                        "background: blue",
+                        innerElement[type],
+                      );
                       return innerElement[type];
                     }
                     return null;
@@ -259,31 +270,31 @@ export class evaluateElements extends Action {
                   if (selector !== "" && filter === "") {
                     const ele = innerElement.querySelector(selector);
                     if (!ele) return null;
-                    console.log(ele);
+
+                    console.log("%c 'filter", "background: pink", ele[type]);
+
                     return ele[type];
                   }
 
                   if (selector !== "" && filter !== "") {
                     const ele = innerElement.querySelector(selector);
-                    console.log(ele[type], filter, type);
+                    if (!ele) return null;
+
                     if (
                       ele[type] != null &&
                       (ele[type] as string)
                         .toLowerCase()
                         .includes(filter.toLowerCase())
                     ) {
-                      console.log("%c 'filter", "background: black", true);
+                      console.log("%c 'filter", "background: green", ele[type]);
                       return ele[type];
                     }
-
-                    return null;
                   }
                 },
                 element,
                 type,
                 selector,
                 filter,
-                deleteFlag,
               );
 
               if (value == null) {
@@ -292,16 +303,14 @@ export class evaluateElements extends Action {
               if (value != null) {
                 elementResultObj[name] = value;
               }
-
-              resolve(value);
             }
-
-            elementParameters.forEach(handleElement);
+            if (deleteFlag) resolve(null);
+            else resolve(elementResultObj);
           });
 
-          if (Object.keys(elementResultObj).length != 0 && !deleteFlag) {
-            this.state.result.push(elementResultObj);
-          }
+          console.log(promise);
+          if (!deleteFlag) this.state.result.push(promise);
+          // }
         } else {
           const type = this.state.info.selectorType;
           const selectorName = this.state.info.selectorName;
