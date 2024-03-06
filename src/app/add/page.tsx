@@ -129,7 +129,7 @@ function Add() {
         actions: actions.filter((action) => action.enabled),
       };
       console.log(outputData);
-      const response = await fetch(process.env.BASE_URL + "/api", {
+      const response = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api", {
         headers: {
           "Content-Type": "application/json",
         },
