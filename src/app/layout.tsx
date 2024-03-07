@@ -21,9 +21,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ThemeProvider>
-      <html lang="en" className={``}>
-        <body className={`${source_sans_3.className} `}>
+    <html lang="en" className={``}>
+      <body className={`${source_sans_3.className} `}>
+        <ThemeProvider>
           <Navbar />
           <main className="mx-auto min-h-svh max-w-screen-xl">{children}</main>
           <footer className="mt-10 bg-gradient-to-tr from-primary to-secondary p-4">
@@ -31,8 +31,8 @@ export default function RootLayout({
               <p className="text-center text-primary-foreground">Footer</p>
             </div>
           </footer>
-        </body>
-      </html>
-    </ThemeProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }
