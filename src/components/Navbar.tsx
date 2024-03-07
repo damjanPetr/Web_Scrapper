@@ -15,14 +15,14 @@ function Navbar({ children }: Props) {
           Web Scrapper
         </Link>
       </div>
-      <nav className="">
+      <nav className="flex items-center gap-8">
         <ul className="flex gap-10 text-xl">
           <li>
             <Link href={"/add"}>Add</Link>
           </li>
         </ul>
+        <ThemeToogle />
       </nav>
-      <ThemeToogle />
     </div>
   );
 }

@@ -12,7 +12,7 @@ function ThemeToogle() {
         <Icon
           className="dark:hidden "
           onClick={() => setTheme("dark")}
-          icon="mdi:theme-light-dark"
+          icon="material-symbols:dark-mode"
           width={24}
           height={24}
         />
@@ -20,7 +20,7 @@ function ThemeToogle() {
       {theme === "dark" && (
         <Icon
           className=""
-          icon="mdi:ab-testing"
+          icon="material-symbols:light-mode"
           width={24}
           height={24}
           onClick={() => setTheme("light")}
