@@ -46,3 +46,6 @@ result.txt
 result.csv
 .puppeteer.cjs
 .puppeteerrc.cjs
+
+# Local Netlify folder
+.netlify

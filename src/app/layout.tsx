@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/Navbar";
+import useTheme, { ThemeProvider } from "@/contex/ThemeContex";
 
 const source_sans_3 = Source_Sans_3({
   subsets: ["latin"],
@@ -20,15 +21,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={``}>
       <body className={`${source_sans_3.className} `}>
-        <Navbar />
-        <main className="mx-auto min-h-svh max-w-screen-xl">{children}</main>
-        <footer className="mt-10 bg-gradient-to-tr from-primary to-secondary p-4">
-          <div className="mx-auto max-w-screen-xl">
-            <p className="text-center text-primary-foreground">Footer</p>
-          </div>
-        </footer>
+        <ThemeProvider>
+          <Navbar />
+          <main className="mx-auto min-h-svh max-w-screen-xl">{children}</main>
+          <footer className="mt-10 bg-gradient-to-tr from-primary to-secondary p-4">
+            <div className="mx-auto max-w-screen-xl">
+              <p className="text-center text-primary-foreground">Footer</p>
+            </div>
+          </footer>
+        </ThemeProvider>
       </body>
     </html>
   );
