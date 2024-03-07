@@ -67,6 +67,7 @@ const itemsPerPage = 10; // Number of items to display per page
 
 function Add() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [error, setError] = useState<{ [key: string]: string | null }>({});
   const [downBtnState, setDownBtnState] = useState(false);
   const [cancelStream, setCancelStream] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -129,7 +130,7 @@ function Add() {
         actions: actions.filter((action) => action.enabled),
       };
       console.log(outputData);
-      const response = await fetch(process.env.BASE_URL + "/api", {
+      const response = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "/api", {
         headers: {
           "Content-Type": "application/json",
         },
@@ -145,8 +146,12 @@ function Add() {
 
           if (chunk.startsWith("{")) {
             const jsonData = JSON.parse(chunk);
-            console.log(jsonData);
-            setData([jsonData]);
+            if (jsonData.error) throw new Error(jsonData.error);
+            if (jsonData.result) {
+              console.log(jsonData);
+              setError({ error: null });
+              setData([jsonData]);
+            }
           } else {
             setProgress(parseInt(chunk));
           }
@@ -159,7 +164,7 @@ function Add() {
       }
     } catch (err) {
       if (err instanceof Error) {
-        throw new Error(err.message);
+        setError({ error: err.message });
       }
     } finally {
       setProgress(0);
@@ -172,6 +177,7 @@ function Add() {
   return (
     <div>
       {/* Down Button */}
+      {error.error && <p className="text-red-500">{error.error}</p>}
       <button
         ref={downBtn}
         type="button"
@@ -453,7 +459,7 @@ function Add() {
           })}
       </div>
       <div>
-        {data.length > 0 && (
+        {totalPages > 1 && (
           <Pagination>
             <PaginationContent className="ml-auto mr-2">
               <PaginationItem>

@@ -78,6 +78,7 @@ export class Invoker implements addToDatabase {
         console.timeEnd(this.state.action!);
       } catch (err) {
         if (err instanceof Error) throw new Error(err.message);
+        return true;
       }
     }
     this.onEnd?.setInvoker(this);
