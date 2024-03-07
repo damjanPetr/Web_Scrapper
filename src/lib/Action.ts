@@ -63,7 +63,8 @@ export class openNewPageAction extends Action {
   async execute() {
     if (this.state.browser?.connected) {
       const page = await this.state.browser.newPage();
-      await page.goto(this.url);
+      const test = await page.goto(this.url);
+      if (test == null) throw new Error("page is null");
       this.state.page = page;
       this.state.info.link = this.url;
     }

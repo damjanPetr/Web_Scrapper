@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   let done = false;
 
   // test.addToDatabase();
-  return new Response(
+  const res = new Response(
     new ReadableStream({
       async start(controller) {
         const timer = setInterval(() => {
@@ -57,11 +57,16 @@ export async function POST(request: NextRequest) {
             controller.close();
           }
         }, 400);
-        await test.activate();
+        try {
+          await test.activate();
+        } catch (err) {
+          if (err instanceof Error)
+            controller.enqueue(JSON.stringify({ error: err.message }));
+          clearInterval(timer);
+          controller.close();
+        }
         console.log(test.state.result.at(-1));
         done = true;
-        // clearInterval(timer);
-        // controller.close();
       },
     }),
     {
@@ -73,6 +78,7 @@ export async function POST(request: NextRequest) {
       },
     },
   );
+  return res;
 
   // return new Response(JSON.stringify(resData));
 }
