@@ -10,6 +10,11 @@ export function middleware(request: Request) {
   if (request.method === "OPTIONS") {
     return NextResponse.json({}, { headers: corsHeaders });
   }
+
+  const res = NextResponse.next({ headers: corsHeaders, request: request });
+
+  res.headers.set("play", "nay");
+  return res;
 }
 
 export const config = {
