@@ -1,4 +1,6 @@
+import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import Link from "next/link";
+import ThemeToogle from "./ThemeToogle";
 
 type Props = {
   children?: React.ReactNode;
@@ -20,6 +22,7 @@ function Navbar({ children }: Props) {
           </li>
         </ul>
       </nav>
+      <ThemeToogle />
     </div>
   );
 }

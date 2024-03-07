@@ -19,10 +19,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { themeContex } from "@/contex/ThemeContex";
 import ExtractElementInput from "@/src/components/ExtractElementInput";
 import { Icon } from "@iconify-icon/react";
 import {
   SyntheticEvent,
+  useContext,
   useEffect,
   useId,
   useReducer,
@@ -173,6 +181,7 @@ function Add() {
       setCancelStream(false);
     }
   }
+  const play = useContext(themeContex);
 
   return (
     <div>
@@ -241,7 +250,24 @@ function Add() {
 
         <div className=" space-y-4 rounded bg-secondary p-4">
           <legend className="mb-8 border-b border-foreground p-2 text-2xl font-semibold ">
-            Grab Items for Scraping
+            Select Scraping Items
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger
+                  onClick={(e) => {
+                    e.preventDefault();
+                  }}
+                  // aria-describedby="tooltip"
+                  tabIndex={1}
+                  className="text-bold  ml-2   cursor-help text-red-300 backdrop-blur-sm"
+                >
+                  <Icon icon="mdi:help" width={14} height={14} />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Filter is used to filter out unwanted elements</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </legend>
           <fieldset
             className={`flex gap-8 rounded ${loading ? " bg-slate-100" : ""}`}
@@ -269,21 +295,23 @@ function Add() {
                 setOptions({ ...options, selector: e.target.value })
               }
             />
-            <Select
-              name="selectorType"
-              defaultValue="href"
-              onValueChange={(e) => {
-                setOptions({ ...options, selectorType: e });
-              }}
-            >
-              <SelectTrigger className="w-[280px] text-lg font-semibold">
-                <SelectValue placeholder="Link Url" />
-              </SelectTrigger>
-              <SelectContent className="text-lg font-semibold">
-                <SelectItem value="href">Link Url</SelectItem>
-                <SelectItem value="textContent">Text Content</SelectItem>
-              </SelectContent>
-            </Select>
+            {actions.length == 0 && (
+              <Select
+                name="selectorType"
+                defaultValue="href"
+                onValueChange={(e) => {
+                  setOptions({ ...options, selectorType: e });
+                }}
+              >
+                <SelectTrigger className="w-[280px] text-lg font-semibold">
+                  <SelectValue placeholder="Link Url" />
+                </SelectTrigger>
+                <SelectContent className="text-lg font-semibold">
+                  <SelectItem value="href">Link Url</SelectItem>
+                  <SelectItem value="textContent">Text Content</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </fieldset>
         </div>
         <div className="flex items-center justify-between gap-4 p-4">
