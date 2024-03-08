@@ -72,10 +72,10 @@ export class Invoker implements addToDatabase {
 
         actionClass.setInvoker(this);
 
-        console.time(this.state.action!);
+        // console.time(this.state.action!);
 
         await actionClass.execute();
-        console.timeEnd(this.state.action!);
+        // console.timeEnd(this.state.action!);
       } catch (err) {
         if (err instanceof Error) throw new Error(err.message);
         return true;
