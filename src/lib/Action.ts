@@ -353,14 +353,14 @@ export class printResultAction extends Action {
   }
   async execute() {
     const info = [this.state.info.title, this.state.info.link];
-
+    const input = this.state.result;
+    console.log(input);
     stringify(
-      this.state.result,
-      { header: true, columns: ["title", "link"] },
+      input,
+      // { header: true, columns: [...Object.keys(input[0])] },
       (err, csv) => {
         if (err) throw err;
-        writeFileSync("./result.csv", info + "\r", { flag: "a" });
-        writeFileSync("./result.csv", csv + "\r", { flag: "a" });
+        writeFileSync("./result.csv", csv + "\r");
       },
     );
   }

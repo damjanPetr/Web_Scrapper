@@ -19,13 +19,21 @@ model Parameter {
   actions Action? @relation(fields: [actionId], references: [id])
 }
 
-model Scrap_Instance {
-  id        Int      @id @default(autoincrement())
-  url       String
-  title     String
-  createdAt DateTime @default(now())
+model Result {
+  id               Int             @id @default(autoincrement())
+  Scrap_Instance   Scrap_Instance? @relation(fields: [scrap_InstanceId], references: [id])
+  scrap_InstanceId Int?
+  body             String
+}
 
-  actions Action[]
+model Scrap_Instance {
+  id          Int      @id @default(autoincrement())
+  url         String
+  title       String
+  createdAt   DateTime @default(now())
+  resultsPath String   @default("")
+  actions     Action[]
+  results     Result[]
 }
 
 model Action {

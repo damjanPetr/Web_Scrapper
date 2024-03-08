@@ -206,17 +206,14 @@ function Add() {
         />
       </button>
       {/* Form for initial selector input */}
-      <form
-        action=""
-        onSubmit={handleSubmit}
-        className="mb-10 space-y-8"
-        id="addForm"
-      >
+      <form action="" onSubmit={handleSubmit} className="mb-10 " id="addForm">
         <fieldset
-          className={`space-y-4 rounded border p-4${loading ? " bg-muted" : " bg-secondary"}`}
+          className={`space-y-4 rounded border text-foreground p-4${loading ? " bg-muted" : " "}`}
           disabled={loading}
         >
-          <h2 className="  p-2 text-2xl font-bold">Add New Session</h2>
+          <h2 itemID={"play"} className="  p-2 text-2xl font-bold">
+            Add New Session
+          </h2>
           <div className="flex items-center gap-8">
             <Label htmlFor={id + "title"} className="text-lg font-medium">
               Title
@@ -232,7 +229,7 @@ function Add() {
               }
             />
           </div>
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-8 ">
             <Label htmlFor={id + "link"} className="text-lg font-medium">
               Link
             </Label>
@@ -248,8 +245,8 @@ function Add() {
           </div>
         </fieldset>
 
-        <div className=" space-y-4 rounded bg-secondary p-4">
-          <legend className="mb-8 border-b border-foreground p-2 text-2xl font-semibold ">
+        <div className=" space-y-4 rounded   p-4 max-sm:min-h-[310px]">
+          <legend className="mb-8 border-b  p-2 text-2xl font-semibold text-foreground  ">
             Select Scraping Items
             <TooltipProvider delayDuration={200}>
               <Tooltip>
@@ -270,12 +267,12 @@ function Add() {
             </TooltipProvider>
           </legend>
           <fieldset
-            className={`flex gap-8 rounded ${loading ? " bg-slate-100" : ""}`}
+            className={`flex flex-col gap-8 rounded  sm:flex-row ${loading ? " bg-slate-100" : ""}`}
             disabled={loading}
           >
             <Input
               placeholder="name"
-              className="basis-1/3 text-xl placeholder:text-lg  placeholder:text-gray-400"
+              className="basis-1/3 text-xl placeholder:text-lg  placeholder:text-muted-foreground"
               required
               type="text"
               name="selectorName"
@@ -287,7 +284,7 @@ function Add() {
             <Input
               required
               type="text"
-              className="text-xl placeholder:text-lg placeholder:text-gray-400"
+              className="text-xl placeholder:text-lg   placeholder:text-muted-foreground"
               placeholder="selector"
               name="page$$"
               id={id + "page$$"}
@@ -303,10 +300,10 @@ function Add() {
                   setOptions({ ...options, selectorType: e });
                 }}
               >
-                <SelectTrigger className="w-[280px] text-lg font-semibold">
+                <SelectTrigger className="text-lg font-semibold text-foreground sm:w-[280px]">
                   <SelectValue placeholder="Link Url" />
                 </SelectTrigger>
-                <SelectContent className="text-lg font-semibold">
+                <SelectContent className="text-lg font-semibold ">
                   <SelectItem value="href">Link Url</SelectItem>
                   <SelectItem value="textContent">Text Content</SelectItem>
                 </SelectContent>
@@ -314,9 +311,9 @@ function Add() {
             )}
           </fieldset>
         </div>
-        <div className="flex items-center justify-between gap-4 p-4">
-          <div className="relative">
-            <div className="flex gap-8 ">
+        <div className="!max-sm:mt-2 flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
+          <div className="relative  max-sm:min-w-80 ">
+            <div className="flex  flex-wrap justify-between gap-8 max-sm:min-h-20 ">
               <Button
                 variant="default"
                 className=""
@@ -351,7 +348,7 @@ function Add() {
             </div>
 
             {loading && (
-              <div className="absolute inset-y-0 left-full ml-4 flex items-center  justify-center gap-2 text-white ">
+              <div className="absolute inset-y-0  top-3/4 ml-4 flex items-center justify-center  gap-2 text-white sm:left-full ">
                 <Icon
                   icon={"svg-spinners:wind-toy"}
                   width={30}
@@ -368,7 +365,7 @@ function Add() {
             )}
           </div>
 
-          <div className="flex gap-8">
+          <div className="flex justify-end  gap-8 max-sm:min-w-80 ">
             {actions.length > 0 && (
               <Button
                 variant="default"
@@ -398,7 +395,7 @@ function Add() {
             </Button>
           </div>
         </div>
-        <section>
+        <section className="space-y-8 p-4">
           {actions.length > 0 &&
             actions.map((item) => {
               return (
@@ -434,6 +431,9 @@ function Add() {
                     </span>{" "}
                     results
                   </p>
+                  <Button variant="default" type="button" onClick={() => {}}>
+                    Export To CSV
+                  </Button>
                 </div>
                 {/* Results rows*/}
 

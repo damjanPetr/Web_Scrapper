@@ -1,6 +1,6 @@
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import Link from "next/link";
-import ThemeToogle from "./ThemeToogle";
+import ThemeToggle from "./ThemeToggle";
 
 type Props = {
   children?: React.ReactNode;
@@ -8,7 +8,7 @@ type Props = {
 
 function Navbar({ children }: Props) {
   return (
-    <div className="mx-auto mb-20 flex items-center justify-between bg-gradient-to-tr from-slate-700 to-foreground px-10  py-4 text-secondary   ">
+    <div className="mx-auto mb-20 flex max-w-screen-2xl items-center  justify-between  bg-background  px-10  py-4 text-foreground   ">
       {/* logo */}
       <div className="text-2xl font-bold ">
         <Link href={"/"} className="text-gradient ">
@@ -21,7 +21,7 @@ function Navbar({ children }: Props) {
             <Link href={"/add"}>Add</Link>
           </li>
         </ul>
-        <ThemeToogle />
+        <ThemeToggle />
       </nav>
     </div>
   );

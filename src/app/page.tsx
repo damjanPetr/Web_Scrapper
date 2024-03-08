@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 async function Home() {
   const instance = await db.scrap_Instance.findMany({
     include: {
+      results: true,
       actions: {
         include: {
           parameters: true,
@@ -22,15 +23,20 @@ async function Home() {
       <div className="">
         <article className="">
           <section className="space-y-4">
-            {instance.map((e) => {
+            {instance.map((instanceItem) => {
               return (
-                <div key={e.id} className="w-full rounded-lg bg-blue-50 p-4 ">
+                <div
+                  key={instanceItem.id}
+                  className="w-full rounded-lg bg-blue-50 p-4 "
+                >
                   <div className="space-y-4 p-4">
                     <h1 className="text-2xl">
-                      <span className="font-semibold">Title:</span> {e.title}
+                      <span className="font-semibold">Title:</span>{" "}
+                      {instanceItem.title}
                     </h1>
                     <h1 className="text-2xl">
-                      <span className="font-semibold">Link: </span> {e.url}
+                      <span className="font-semibold">Link: </span>{" "}
+                      {instanceItem.url}
                     </h1>
                   </div>
                   <div className="bg-red-200">
@@ -38,7 +44,7 @@ async function Home() {
                       Actions
                     </h2>
                     <div className="">
-                      {e.actions.map((action) => {
+                      {instanceItem.actions.map((action) => {
                         return (
                           <div key={action.id} className="grid grid-cols-2">
                             <p>{action.action}</p>
@@ -64,6 +70,15 @@ async function Home() {
                   <h2 className="  bg-fuchsia-700 p-2 text-xl font-bold text-white ">
                     Results
                   </h2>
+                  <div className="">
+                    {instanceItem.results.map((result) => {
+                      return (
+                        <p className="" key={result.id}>
+                          {JSON.parse(result.body).toString()}
+                        </p>
+                      );
+                    })}
+                  </div>
                 </div>
               );
             })}
