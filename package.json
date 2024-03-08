@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
+    "@flydotio/dockerfile": "^0.5.2",
     "@iconify-icon/react": "^2.0.1",
     "@types/node": "^20",
     "@types/react-dom": "^18",
