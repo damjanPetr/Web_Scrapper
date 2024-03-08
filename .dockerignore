@@ -44,7 +44,6 @@ next-env.d.ts
 #dev results
 result.txt
 result.csv
-# .puppeteer.cjs
 # .puppeteerrc.cjs
 .cache
 

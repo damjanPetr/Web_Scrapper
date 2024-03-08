@@ -45,7 +45,7 @@ next-env.d.ts
 result.txt
 result.csv
 # .puppeteer.cjs
-.puppeteerrc.cjs
+# .puppeteerrc.cjs
 .cache
 
 # Local Netlify folder

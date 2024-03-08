@@ -7,12 +7,16 @@ type Props = {
 };
 
 function Navbar({ children }: Props) {
+  const link = process.env.NEXT_PUBLIC_BASE_URL;
+  const meh = process.env.PUPPETEER_CACHE_DIR;
+  const ee = process.env.DATABASE_URL;
+
   return (
     <div className="mx-auto mb-20 flex max-w-screen-2xl items-center  justify-between  bg-background  px-10  py-4 text-foreground   ">
       {/* logo */}
       <div className="text-2xl font-bold ">
         <Link href={"/"} className="text-gradient ">
-          Web Scrapper
+          {link} {meh} {ee}link Web Scrapper
         </Link>
       </div>
       <nav className="flex items-center gap-8">

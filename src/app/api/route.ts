@@ -3,6 +3,9 @@ import { Invoker } from "@/src/lib/Invoker";
 import { NextRequest } from "next/server";
 import { actionsType } from "../add/page";
 
+export async function GET() {
+  return new Response("Hello, Next.js!");
+}
 export async function POST(request: NextRequest) {
   const body = await request.json();
 

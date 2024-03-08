@@ -51,6 +51,9 @@ export class loadBrowserAction extends Action {
   async execute() {
     this.state.browser = await puppeteer.launch({
       headless: "shell",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+
+      // executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
     });
   }
 }
