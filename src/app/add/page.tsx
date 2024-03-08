@@ -245,7 +245,7 @@ function Add() {
           </div>
         </fieldset>
 
-        <div className=" space-y-4 rounded   p-4 max-sm:min-h-[310px]">
+        <div className=" space-y-4 rounded   p-4 text-foreground max-sm:min-h-[310px]">
           <legend className="mb-8 border-b  p-2 text-2xl font-semibold text-foreground  ">
             Select Scraping Items
             <TooltipProvider delayDuration={200}>
@@ -337,7 +337,7 @@ function Add() {
               {data.length > 0 && !loading && (
                 <Button
                   variant="default"
-                  className="bg-red-400 hover:bg-red-600"
+                  className=" bg-destructive text-destructive-foreground "
                   disabled={loading}
                   type="submit"
                   onClick={() => setData([])}
@@ -369,7 +369,7 @@ function Add() {
             {actions.length > 0 && (
               <Button
                 variant="default"
-                className="bg-red-400 "
+                className=" bg-destructive text-destructive-foreground "
                 disabled={loading}
                 type="submit"
                 onClick={(e) => {

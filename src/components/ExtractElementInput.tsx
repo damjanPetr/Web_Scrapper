@@ -179,7 +179,7 @@ function ExtractElementInput({
             tabIndex={0}
             width={24}
             height={24}
-            className={`bubble   rounded-md  p-0.5   ${enabled ? "test_color_mod2" : "test_color_mod1"}`}
+            className={`bubble  rounded-md bg-accent   p-0.5   ${enabled ? "active" : ""}`}
             onClick={() => {
               // setEnabled(!enabled);
               dispatch({ type: "toggle", uuid: uuid });
@@ -190,7 +190,7 @@ function ExtractElementInput({
             tabIndex={0}
             width={24}
             height={24}
-            className="bubble rounded-md bg-red-500 p-0.5"
+            className="bubble rounded-md bg-destructive p-0.5 text-destructive-foreground"
             onClick={(e) => {
               e.preventDefault();
               dispatch({ type: "remove", uuid: uuid });

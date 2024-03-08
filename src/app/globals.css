@@ -55,7 +55,7 @@
     --muted-foreground: 215 20.2% 65.1%;
 
     --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent-foreground: 210 40%, 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
@@ -63,6 +63,12 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+    .bg-destructive {
+      &:hover {
+        filter: hue-rotate(-20deg);
+        color: white;
+      }
+    }
   }
 }
 
@@ -72,8 +78,7 @@
   }
   body {
     @apply text-foreground;
-
-    background-image: linear-gradient(62deg, #8ec5fc 0%, #e0c3fc 100%);
+    background-image: linear-gradient(62deg, #e1ebf6 0%, #e0c3fc 100%);
   }
 }
 
@@ -100,15 +105,12 @@
   .bubble {
     z-index: 1;
     position: relative;
-    font-size: inherit;
-    font-family: inherit;
     color: white;
     padding: 0.5em 1em;
     outline: none;
     border: none;
-    background-color: hsl(236, 32%, 26%);
     overflow: hidden;
-    transition: color 0.4s ease-in-out;
+    transition: color 0.1s ease-in-out;
   }
 
   .bubble::before {
@@ -124,12 +126,13 @@
     background-color: var(--test_color);
     transform-origin: center;
     transform: translate3d(-50%, 50%, 0) scale3d(0, 0, 0);
-    transition: all 0.2s ease-in-out;
+    transition: all 0.1s ease-in-out;
   }
 
   &.bubble:hover {
     cursor: pointer;
-    color: #161616;
+    color: #000;
+    /* color: #161616; */
   }
 
   & :hover::before {
@@ -140,22 +143,15 @@
     transform: translate3d(-50%, 50%, 0) scale3d(15, 15, 15);
   }
   & :focus {
-    outline: 4px solid;
+    outline: hsl(var(--ring)) 2px solid;
   }
-}
 
-.bubble.test_color_mod1 {
-  color: black;
-  background-color: hsl(63, 100%, 70%);
-  &:before {
-    --test_color: hsl(128, 100%, 50%);
-  }
-}
-
-.bubble.test_color_mod2 {
-  background: green;
-  color: white;
-  &:before {
-    --test_color: hsl(200, 100%, 50%);
+  .active {
+    /* color: black; */
+    color: white;
+    background-color: hsl(128, 100%, 50%);
+    &:before {
+      --test_color: hsl(128, 100%, 20%);
+    }
   }
 }

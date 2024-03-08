@@ -12,7 +12,7 @@ function Navbar({ children }: Props) {
       {/* logo */}
       <div className="text-2xl font-bold ">
         <Link href={"/"} className="text-gradient ">
-          link Web Scrapper
+          Web Scrapper
         </Link>
       </div>
       <nav className="flex items-center gap-8">
