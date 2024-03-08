@@ -33,11 +33,10 @@ export async function POST(request: NextRequest) {
   test.addAction("addTitle", title);
   test.addAction("page$$", selector, selectorType, selectorName);
   test.addAction("evaluateElements");
-  // test.addAction("printResult");
+  test.addAction("printResult");
 
   let done = false;
 
-  // test.addToDatabase();
   const res = new Response(
     new ReadableStream({
       async start(controller) {
@@ -59,6 +58,7 @@ export async function POST(request: NextRequest) {
         }, 400);
         try {
           await test.activate();
+          test.addToDatabase();
         } catch (err) {
           if (err instanceof Error)
             controller.enqueue(JSON.stringify({ error: err.message }));

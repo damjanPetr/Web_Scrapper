@@ -47,15 +47,15 @@ function ExtractElementInput({
   return (
     <fieldset
       disabled={disabled}
-      className={`relative rounded p-2 transition-colors ${enabled && "bg-green-500/50"}`}
+      className={`relative   rounded p-2 transition-colors ${enabled && "bg-green-500/50"}`}
     >
       {enabled && (
         <div className="absolute  right-0 top-0   rounded-bl border-b-2 border-l-2 border-green-100 bg-green-500/60 p-2 font-bold text-white ">
           Enabled
         </div>
       )}
-      <div className={`flex gap-8  rounded ${enabled ? "" : ""}`}>
-        <div className="space-y-4 ">
+      <div className={`gap-8  rounded  md:flex ${enabled ? "" : ""}`}>
+        <div className="mt-4">
           <Label htmlFor={id + "selectorName"} className="text-lg text-white ">
             Name
           </Label>
@@ -72,7 +72,7 @@ function ExtractElementInput({
           />
         </div>
 
-        <div className="space-y-4 ">
+        <div className="mt-4">
           <div className="flex items-center justify-between  text-white ">
             <Label
               htmlFor={id + `page$$`}
@@ -116,7 +116,7 @@ function ExtractElementInput({
 
         {/* Dropdown */}
 
-        <div className="space-y-4 ">
+        <div className="mt-4">
           <Label htmlFor={id + `type`} className="text-lg text-white">
             Type
           </Label>
@@ -135,7 +135,7 @@ function ExtractElementInput({
         </div>
 
         {/* filter */}
-        <div className="space-y-4">
+        <div className="mt-4">
           <div className="">
             <Label htmlFor={id + `filter`} className="text-lg text-white   ">
               Filter

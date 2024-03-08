@@ -3,7 +3,7 @@
 import useTheme from "@/contex/ThemeContex";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 
-function ThemeToogle() {
+function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -29,4 +29,4 @@ function ThemeToogle() {
     </div>
   );
 }
-export default ThemeToogle;
+export default ThemeToggle;

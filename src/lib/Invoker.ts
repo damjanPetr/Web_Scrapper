@@ -104,6 +104,11 @@ export class Invoker implements addToDatabase {
         data: {
           title: this.state.info.title,
           url: this.state.info.link,
+          results: {
+            create: {
+              body: JSON.stringify(this.state.result),
+            },
+          },
         },
       });
       actions.forEach(async ({ action, parameters }) => {

@@ -3,6 +3,7 @@ import { Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/Navbar";
 import useTheme, { ThemeProvider } from "@/contex/ThemeContex";
+import Footer from "../components/Footer";
 
 const source_sans_3 = Source_Sans_3({
   subsets: ["latin"],
@@ -26,11 +27,7 @@ export default function RootLayout({
         <ThemeProvider>
           <Navbar />
           <main className="mx-auto min-h-svh max-w-screen-xl">{children}</main>
-          <footer className="mt-10 bg-gradient-to-tr from-primary to-secondary p-4">
-            <div className="mx-auto max-w-screen-xl">
-              <p className="text-center text-primary-foreground">Footer</p>
-            </div>
-          </footer>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
