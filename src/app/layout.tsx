@@ -1,9 +1,9 @@
+import { ThemeProvider } from "@/contex/ThemeContex";
 import type { Metadata } from "next";
 import { Source_Sans_3 } from "next/font/google";
-import "./globals.css";
-import Navbar from "../components/Navbar";
-import useTheme, { ThemeProvider } from "@/contex/ThemeContex";
 import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
+import "./globals.css";
 
 const source_sans_3 = Source_Sans_3({
   subsets: ["latin"],

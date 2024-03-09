@@ -1,7 +1,9 @@
 import { Metadata } from "next";
-import db from "../database/Database";
-import Footer from "../components/Footer";
+
 import PopupBars from "../components/PopupBars";
+import db from "../database/Database";
+import Link from "next/link";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Web Scrapper Homepage",
@@ -21,15 +23,28 @@ async function Home() {
   });
 
   return (
-    <div className="overflow-hidden p-1 text-foreground ">
-      <div className="hero mt-80 bg-pink-900 p-10">
-        <div className="bg-blue-200 p-2 ">
+    <div className="overflow-hidden rounded  p-1 text-foreground ">
+      <div className="hero mt-60  bg-background p-10">
+        <div className="   bg-background p-4 text-foreground">
+          <h1 className="text-3xl "> Grab Context Easily</h1>
+
+          <h2 className="text-1xl mt-4">Empower Your Data</h2>
+          <p className="mt-10">Unlock the full potential of the internet.</p>
+          <p>Reliable, structured data:</p>
+          <p>Tailored to your business needs:</p>
+          <div className="mt-8 ">
+            <Link
+              className="border-lg mt-10 rounded bg-primary p-2 text-xl text-foreground text-white "
+              href={"/add"}
+            >
+              Try it out right now
+            </Link>
+          </div>
+        </div>
+        <div className="bg-background p-4 ">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia ullam
           tempora eum alias doloremque molestiae distinctio quasi eveniet
           inventore illo.
-        </div>
-        <div className="bg-green-200">
-          <h1 className="text-2xl"> Lorem, ipsum.</h1>
         </div>
       </div>
       <PopupBars />

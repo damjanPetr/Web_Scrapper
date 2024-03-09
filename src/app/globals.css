@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 195 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -216,8 +216,13 @@
 
 .hero {
   display: grid;
-  grid-template: "a b" 200px/2fr 1fr;
+  grid-template: "a b" auto/1fr 2fr;
+  gap: 1rem;
+  @media (width <= 800px) {
+    grid-template: "a" auto "b" auto/1fr;
+  }
 }
+
 @keyframes enter {
   from {
     transform: translateY(0);
