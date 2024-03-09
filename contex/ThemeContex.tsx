@@ -24,7 +24,7 @@ export function ThemeProvider({ children }: Props) {
 
   return (
     <themeContex.Provider value={{ theme, setTheme }}>
-      <div className={`theme ${theme}`}>{children}</div>
+      <div className={` theme ${theme}`}>{children}</div>
     </themeContex.Provider>
   );
 }

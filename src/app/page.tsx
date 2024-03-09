@@ -19,21 +19,24 @@ async function Home() {
   });
 
   return (
-    <div className="">
+    <div className="p-1">
+      <div className="hero mt-20 bg-pink-900 p-10">
+        <div className="bg-blue-200"></div>
+        <div className="bg-green-200"></div>
+      </div>
       <div className="">
-        <article className="">
-          <section className="space-y-4"></section>
-        </article>
-        <div className="window_popup ">
-          <div className="l">
-            <div className="item"></div>
-            <div className="item"></div>
-            <div className="item"></div>
-          </div>
-          <div className="r">
-            <div className="item"></div>
-            <div className="item"></div>
-            <div className="item"></div>
+        <div className="widget fixed bottom-0 left-0 w-full  p-20">
+          <div className="window_popup">
+            <div className="l ">
+              <div className="item"></div>
+              <div className="item"></div>
+              <div className="item"></div>
+            </div>
+            <div className="r ">
+              <div className="item"></div>
+              <div className="item"></div>
+              <div className="item"></div>
+            </div>
           </div>
         </div>
       </div>

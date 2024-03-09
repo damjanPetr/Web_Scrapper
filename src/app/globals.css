@@ -82,12 +82,12 @@
   }
   body {
     @apply text-foreground;
-    background-image: linear-gradient(62deg, #e1ebf6 0%, #e0c3fc 100%);
+    background-image: linear-gradient(0deg, #e1ebf6 0%, #e0c3fc 100%);
   }
 }
 
 .theme.dark {
-  background-image: linear-gradient(62deg, #273441 0%, #e0c3fc 100%);
+  background-image: linear-gradient(0deg, #273441 0%, #e0c3fc 100%);
 }
 
 @layer components {
@@ -117,30 +117,42 @@
   }
   .window_popup {
     position: absolute;
+    width: 100%;
+    background: rgb(255, 255, 255, 0.2);
+    z-index: -10;
     left: 0;
-    top: 100%;
+    top: 0;
+    /* transform: translateY(100%); */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
     animation: enter 1s 0s ease-in-out forwards;
-    height: 200px;
 
-    /* overflow: hidden; */
+    overflow: hidden;
     .item {
-      --dir: to left;
+      @media (width <= 800px) {
+        height: 10px !important;
+        width: 200px !important;
+      }
+      --dir: to right;
       border-radius: var(--radius);
       transition: all 1s ease-in-out;
       height: 40px;
       width: 300px;
-      bottom: 0;
-      /* background: hsl(var(--primary)); */
-      background: linear-gradient(var(--dir), #273441 10%, #e0c3fc);
+      flex-shrink: 19;
+      .dark & {
+        background: linear-gradient(var(--dir), #273441 0%, #e0c3fc 100%);
+      }
+      background: linear-gradient(var(--dir), #e1ebf6 0%, #e0c3fc 100%);
+
       margin-top: 20px;
     }
     .l {
       .item {
-        --dir: to right;
+        --dir: to left;
+        .dark & {
+          --dir: to right;
+        }
         &:nth-child(1) {
           transform: rotate(30deg);
         }
@@ -155,6 +167,11 @@
     }
     .r {
       .item {
+        margin-left: auto;
+        --dir: to right;
+        .dark & {
+          --dir: to left;
+        }
         &:nth-child(1) {
           transform: rotate(-30deg);
         }
@@ -170,6 +187,10 @@
   }
 }
 
+.hero {
+  display: grid;
+  grid-template: "a b" 200px/2fr 1fr;
+}
 @keyframes enter {
   from {
     transform: translateY(0);
