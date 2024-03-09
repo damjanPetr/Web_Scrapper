@@ -25,6 +25,9 @@
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
+    --approved: 100 50% 50%;
+    --approved--foreground: 100 20%, 98%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
@@ -57,6 +60,9 @@
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40%, 98%;
 
+    --approved: 123 55.24% 22.01%;
+    --approved--foreground: 200 40%, 98%;
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
@@ -70,9 +76,7 @@
       }
     }
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
@@ -83,37 +87,120 @@
 }
 
 .theme.dark {
-  @apply bg-background;
   background-image: linear-gradient(62deg, #273441 0%, #e0c3fc 100%);
 }
 
 @layer components {
   .text-gradient {
+    --color1: #00a651;
+    --color2: #72c6ef;
+    --color3: #c08844;
     display: inline-block;
-    font-size: 48px;
     line-height: 1;
-    font-weight: black;
-
-    background: linear-gradient(to top left, #f7941e, #72c6ef, #00a651);
-    -webkit-background-clip: text;
+    background: linear-gradient(
+      to top left,
+      var(--color1),
+      var(--color2),
+      var(--color3)
+    );
     background-clip: text;
+    -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    transition: all 1s ease-in-out;
+  }
+  .dark {
+    .text-gradient {
+      --color3: #f8d0a0;
+      --color1: #77ffb9;
+      --color2: #a2d3ec;
+    }
+  }
+  .window_popup {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    animation: enter 1s 0s ease-in-out forwards;
+    height: 200px;
+
+    /* overflow: hidden; */
+    .item {
+      --dir: to left;
+      border-radius: var(--radius);
+      transition: all 1s ease-in-out;
+      height: 40px;
+      width: 300px;
+      bottom: 0;
+      /* background: hsl(var(--primary)); */
+      background: linear-gradient(var(--dir), #273441 10%, #e0c3fc);
+      margin-top: 20px;
+    }
+    .l {
+      .item {
+        --dir: to right;
+        &:nth-child(1) {
+          transform: rotate(30deg);
+        }
+        &:nth-child(2) {
+          transform: rotate(20deg);
+        }
+        &:nth-child(3) {
+          transform: rotate(10deg);
+          width: 400px;
+        }
+      }
+    }
+    .r {
+      .item {
+        &:nth-child(1) {
+          transform: rotate(-30deg);
+        }
+        &:nth-child(2) {
+          transform: rotate(-20deg);
+        }
+        &:nth-child(3) {
+          transform: rotate(-10deg);
+          width: 400px;
+        }
+      }
+    }
   }
 }
 
-@layer utilities {
-  .bubble {
-    z-index: 1;
-    position: relative;
-    color: white;
-    padding: 0.5em 1em;
-    outline: none;
-    border: none;
-    overflow: hidden;
-    transition: color 0.1s ease-in-out;
+@keyframes enter {
+  from {
+    transform: translateY(0);
   }
-
-  .bubble::before {
+  to {
+    transform: translateY(-100px);
+  }
+}
+.bubble {
+  z-index: 1;
+  position: relative;
+  color: white;
+  padding: 0.5em 1em;
+  outline: none;
+  border: none;
+  overflow: hidden;
+  transition: color 0.2s ease-in-out;
+  &:hover {
+    cursor: pointer;
+    /* color: #161616; */
+    &::before {
+      transform: translate3d(-50%, 50%, 0) scale3d(15, 15, 15);
+    }
+  }
+  &:focus {
+    outline: hsl(var(--ring)) 2px solid;
+    &:before {
+      transform: translate3d(-50%, 50%, 0) scale3d(15, 15, 15);
+    }
+  }
+  &::before {
     --test_color: orange;
     content: "";
     z-index: -1;
@@ -126,32 +213,24 @@
     background-color: var(--test_color);
     transform-origin: center;
     transform: translate3d(-50%, 50%, 0) scale3d(0, 0, 0);
-    transition: all 0.1s ease-in-out;
+    transition: all 0.2s ease-in-out;
   }
-
-  &.bubble:hover {
-    cursor: pointer;
-    color: #000;
-    /* color: #161616; */
-  }
-
-  & :hover::before {
-    transform: translate3d(-50%, 50%, 0) scale3d(15, 15, 15);
-  }
-
-  & :focus::before {
-    transform: translate3d(-50%, 50%, 0) scale3d(15, 15, 15);
-  }
-  & :focus {
-    outline: hsl(var(--ring)) 2px solid;
-  }
-
-  .active {
-    /* color: black; */
-    color: white;
+  &.active {
     background-color: hsl(128, 100%, 50%);
     &:before {
       --test_color: hsl(128, 100%, 20%);
+    }
+  }
+}
+
+.dark {
+  & .bubble {
+    /* filter: invert(1); */
+    &.active {
+      background-color: hsl(128, 40%, 50%);
+      &::before {
+        --test_color: hsl(196, 92%, 21%);
+      }
     }
   }
 }

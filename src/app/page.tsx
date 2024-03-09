@@ -22,68 +22,20 @@ async function Home() {
     <div className="">
       <div className="">
         <article className="">
-          <section className="space-y-4">
-            {instance.map((instanceItem) => {
-              return (
-                <div
-                  key={instanceItem.id}
-                  className="w-full rounded-lg bg-blue-50 p-4 "
-                >
-                  <div className="space-y-4 p-4">
-                    <h1 className="text-2xl">
-                      <span className="font-semibold">Title:</span>{" "}
-                      {instanceItem.title}
-                    </h1>
-                    <h1 className="text-2xl">
-                      <span className="font-semibold">Link: </span>{" "}
-                      {instanceItem.url}
-                    </h1>
-                  </div>
-                  <div className="bg-red-200">
-                    <h2 className="bg-fuchsia-300  p-2 text-xl font-bold text-gray-700 ">
-                      Actions
-                    </h2>
-                    <div className="">
-                      {instanceItem.actions.map((action) => {
-                        return (
-                          <div key={action.id} className="grid grid-cols-2">
-                            <p>{action.action}</p>
-                            <div className="basis-1/2">
-                              <h3 className="bg-gray-50 text-lg font-bold">
-                                Parameters
-                              </h3>
-                              <div className="flex items-center gap-4  p-4">
-                                {action.parameters.map((parameter) => {
-                                  return (
-                                    <div className="" key={parameter.id}>
-                                      <div className="">{parameter.value}</div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <h2 className="  bg-fuchsia-700 p-2 text-xl font-bold text-white ">
-                    Results
-                  </h2>
-                  <div className="">
-                    {instanceItem.results.map((result) => {
-                      return (
-                        <p className="" key={result.id}>
-                          {JSON.parse(result.body).toString()}
-                        </p>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </section>
+          <section className="space-y-4"></section>
         </article>
+        <div className="window_popup ">
+          <div className="l">
+            <div className="item"></div>
+            <div className="item"></div>
+            <div className="item"></div>
+          </div>
+          <div className="r">
+            <div className="item"></div>
+            <div className="item"></div>
+            <div className="item"></div>
+          </div>
+        </div>
       </div>
     </div>
   );

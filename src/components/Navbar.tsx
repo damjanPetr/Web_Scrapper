@@ -1,4 +1,5 @@
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
+import Image from "next/image";
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
 
@@ -8,11 +9,26 @@ type Props = {
 
 function Navbar({ children }: Props) {
   return (
-    <div className="mx-auto mb-20 flex max-w-screen-2xl items-center  justify-between  bg-background  px-10  py-4 text-foreground   ">
+    <div className="group mx-auto mb-20 flex max-w-screen-2xl  items-center  justify-between  bg-background  px-10 py-4 text-foreground  ">
       {/* logo */}
-      <div className="text-2xl font-bold ">
-        <Link href={"/"} className="text-gradient ">
-          Web Scrapper
+      <div className="flex gap-4 text-xl ">
+        <Image
+          src="/logo_black.svg"
+          alt="logo"
+          width={50}
+          height={50}
+          className="dark:hidden"
+        />
+        <Image
+          src="/logo_white.svg"
+          alt="logo"
+          width={50}
+          color="red"
+          className="hidden dark:block"
+          height={50}
+        />
+        <Link href={"/"} className="text-gradient dark:bounce text-4xl">
+          Scrappify
         </Link>
       </div>
       <nav className="flex items-center gap-8">

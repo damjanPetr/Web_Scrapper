@@ -47,10 +47,10 @@ function ExtractElementInput({
   return (
     <fieldset
       disabled={disabled}
-      className={`relative   rounded p-2 transition-colors ${enabled && "bg-green-500/50"}`}
+      className={`relative   rounded p-2 transition-colors ${enabled && "bg-green-400/50 dark:bg-green-800/50"}`}
     >
       {enabled && (
-        <div className="absolute  right-0 top-0   rounded-bl border-b-2 border-l-2 border-green-100 bg-green-500/60 p-2 font-bold text-white ">
+        <div className="absolute  right-0 top-0   rounded-bl border-b-2 border-l-2  bg-green-500/60 p-2 font-bold text-white ">
           Enabled
         </div>
       )}
@@ -179,7 +179,7 @@ function ExtractElementInput({
             tabIndex={0}
             width={24}
             height={24}
-            className={`bubble  rounded-md bg-accent   p-0.5   ${enabled ? "active" : ""}`}
+            className={`bubble  bg-approved rounded-md  p-0.5   ${enabled ? "active" : ""}`}
             onClick={() => {
               // setEnabled(!enabled);
               dispatch({ type: "toggle", uuid: uuid });
