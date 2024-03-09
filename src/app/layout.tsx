@@ -29,8 +29,9 @@ export default function RootLayout({
           <main className="mx-auto min-h-[calc(100vh-128px)] max-w-screen-xl">
             {children}
           </main>
-          <Footer />
+          {/* <Footer /> */}
         </ThemeProvider>
+        <Footer />
       </body>
     </html>
   );

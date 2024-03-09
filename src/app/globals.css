@@ -118,36 +118,32 @@
   .window_popup {
     position: absolute;
     width: 100%;
-    background: rgb(255, 255, 255, 0.2);
-    z-index: -10;
+    z-index: -1;
     left: 0;
     top: 0;
-    /* transform: translateY(100%); */
     display: flex;
     justify-content: space-between;
     align-items: center;
     animation: enter 1s 0s ease-in-out forwards;
-
-    overflow: hidden;
     .item {
       @media (width <= 800px) {
         height: 10px !important;
         width: 200px !important;
       }
       --dir: to right;
-      border-radius: var(--radius);
+      /* border-radius: var(--radius); */
       transition: all 1s ease-in-out;
-      height: 40px;
-      width: 300px;
-      flex-shrink: 19;
+      height: 25px;
+      width: 200px;
+      flex-shrink: 1;
       .dark & {
         background: linear-gradient(var(--dir), #273441 0%, #e0c3fc 100%);
       }
       background: linear-gradient(var(--dir), #e1ebf6 0%, #e0c3fc 100%);
-
       margin-top: 20px;
     }
-    .l {
+
+    .left_side {
       .item {
         --dir: to left;
         .dark & {
@@ -165,7 +161,7 @@
         }
       }
     }
-    .r {
+    .right_side {
       .item {
         margin-left: auto;
         --dir: to right;
@@ -185,6 +181,37 @@
       }
     }
   }
+
+  .active {
+    .left_side {
+      .item {
+        &:nth-child(1) {
+          transform: rotate(130deg) translateX(-10px);
+        }
+        &:nth-child(2) {
+          transform: rotate(120deg) translateX(-20px);
+        }
+        &:nth-child(3) {
+          transform: rotate(110deg) translateX(-30px);
+          width: 400px;
+        }
+      }
+    }
+    .right_side {
+      .item {
+        &:nth-child(1) {
+          transform: rotate(-130deg) translateX(10px);
+        }
+        &:nth-child(2) {
+          transform: rotate(-120deg) translateX(20px);
+        }
+        &:nth-child(3) {
+          transform: rotate(-110deg) translateX(30px);
+          width: 400px;
+        }
+      }
+    }
+  }
 }
 
 .hero {
@@ -196,7 +223,7 @@
     transform: translateY(0);
   }
   to {
-    transform: translateY(-100px);
+    transform: translateY(100px);
   }
 }
 .bubble {
