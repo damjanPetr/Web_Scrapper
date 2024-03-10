@@ -69,60 +69,90 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-
-    .bg-destructive {
-      &:hover {
-        filter: hue-rotate(-20deg);
-        color: white;
-      }
-    }
   }
 
   * {
     @apply border-border;
   }
+
   body {
     @apply text-foreground;
     /* background: linear-gradient(to top, #3f2b96, #a8c0ff); */
-    background-image: url("https://www.transparenttextures.com/patterns/arabesque.png");
+    /* background-image: url("https://www.transparenttextures.com/patterns/arabesque.png"); */
     position: relative;
-  }
-  &:after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    width: 100%;
     height: 100%;
-    background: linear-gradient(
-      to top,
-      hsla(251, 55%, 38%, 0.866),
-      hsla(223, 100%, 83%, 0.478)
-    );
-  }
-  &.dark {
-    &:after {
-      background-color: hsla(90, 28%, 60%, 0.696);
+    .theme {
+      height: 100%;
+      width: 100%;
+      background-image: url("https://www.transparenttextures.com/patterns/arabesque.png");
+      background-position: center;
+      z-index: -1;
+      &.dark {
+        background: blue;
+      }
+      &:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          to top,
+          hsla(251, 55%, 38%, 0.866),
+          hsla(223, 100%, 83%, 0.478)
+        );
+        .dark & {
+          background: blue !important;
+          padding: 2000px;
+          /* background-image: linear-gradient(
+            to right,
+            #273441 0%,
+            #e0c3fc 100%
+          ) !important; */
+        }
+      }
     }
   }
 }
 
-.theme.dark {
-  background-image: linear-gradient(to top, #273441 0%, #e0c3fc 100%);
+/* body:has(.dark)::after {
+  background: blue !important;
+  /* background-image: linear-gradient(
+    to right,
+    #273441 0%,
+    #e0c3fc 100%
+  ) !important; 
 }
+ */
+
+/* .theme.dark {
+  background-image: linear-gradient(to top, #273441 0%, #e0c3fc 100%);
+} */
 
 @layer components {
   .bg-background {
-    background-color: #343d57;
-    background-image: url("https://www.transparenttextures.com/patterns/clean-gray-paper.png");
+    background-color: #575757;
+    background-image: url("https://www.transparenttextures.com/patterns/whitey.png");
+    /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+    .dark & {
+      /* background-color: #343d57 !important;
+      background-image: url("https://www.transparenttextures.com/patterns/sneaker-mesh-fabric.png"); */
+      background-color: #113545;
+      background-image: url("https://www.transparenttextures.com/patterns/random-grey-variations.png");
+      /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+    }
   }
   .text-gradient {
-    --color1: #00a651;
-    --color2: #72c6ef;
-    --color3: #c08844;
+    --color1: #007739;
+    --color2: #1d6386;
+    --color3: #784f1c;
     display: inline-block;
     line-height: 1;
+    .logo {
+      animation: 4s ease-in 3s infinite alternate alter;
+    }
     background: linear-gradient(
       to top left,
       var(--color1),
@@ -132,13 +162,11 @@
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    transition: all 1s ease-in-out;
-  }
-  .dark {
-    .text-gradient {
-      --color3: #f8d0a0;
-      --color1: #77ffb9;
-      --color2: #a2d3ec;
+    transition: all 0.2s ease-in-out;
+    .dark & {
+      --color3: #f5e9db;
+      --color1: #56eb9e;
+      --color2: #70c1ea;
     }
   }
   .window_popup {
@@ -157,9 +185,9 @@
         width: 200px !important;
       }
       --dir: to right;
-      /* border-radius: var(--radius); */
+      border-radius: var(--radius);
       transition: all 1s ease-in-out;
-      height: 25px;
+      height: 20px;
       width: 200px;
       flex-shrink: 1;
       .dark & {
@@ -248,14 +276,6 @@
   }
 }
 
-@keyframes enter {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(100px);
-  }
-}
 .bubble {
   z-index: 1;
   position: relative;
@@ -307,5 +327,23 @@
         --test_color: hsl(196, 92%, 21%);
       }
     }
+  }
+}
+
+@keyframes enter {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100px);
+  }
+}
+
+@keyframes alter {
+  from {
+    transform: rotate3d(0, 0, 0, 0);
+  }
+  to {
+    transform: rotate3d(0, 1, 0, 90deg);
   }
 }

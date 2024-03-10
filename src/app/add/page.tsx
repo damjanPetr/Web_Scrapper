@@ -187,12 +187,15 @@ function Add() {
       setCancelStream(false);
     }
   }
-  const play = useContext(themeContex);
 
   return (
-    <div>
+    <div className="relative">
       {/* Down Button */}
-      {error.error && <p className="text-red-500">{error.error}</p>}
+      {error.error && (
+        <p className="absolute top-full w-full rounded bg-destructive p-2 text-destructive-foreground">
+          {error.error}
+        </p>
+      )}
       <button
         ref={downBtn}
         type="button"
@@ -214,7 +217,7 @@ function Add() {
       {/* Form for initial selector input */}
       <form action="" onSubmit={handleSubmit} className="mb-10 " id="addForm">
         <fieldset
-          className={`space-y-4 rounded border text-foreground p-4${loading ? " bg-muted" : " "}`}
+          className={`space-y-4 rounded border bg-background text-foreground p-4${loading ? " bg-muted" : " "}`}
           disabled={loading}
         >
           <h2 itemID={"play"} className="  p-2 text-2xl font-bold">
@@ -251,7 +254,7 @@ function Add() {
           </div>
         </fieldset>
 
-        <div className=" space-y-4 rounded   p-4 text-foreground max-sm:min-h-[310px]">
+        <div className=" mt-10 space-y-4  rounded bg-background p-4 text-foreground max-sm:min-h-[310px]">
           <legend className="mb-8 border-b  p-2 text-2xl font-semibold text-foreground  ">
             Select Scraping Items
             <TooltipProvider delayDuration={200}>
@@ -273,7 +276,7 @@ function Add() {
             </TooltipProvider>
           </legend>
           <fieldset
-            className={`flex flex-col gap-8 rounded  sm:flex-row ${loading ? " bg-slate-100" : ""}`}
+            className={`mt-10 flex flex-col gap-8 rounded  sm:flex-row ${loading ? " " : ""}`}
             disabled={loading}
           >
             <Input
@@ -381,8 +384,6 @@ function Add() {
                 disabled={loading}
                 type="submit"
                 onClick={(e) => {
-                  e.preventDefault();
-
                   dispatch({ type: "removeAll" });
                 }}
               >
@@ -395,7 +396,6 @@ function Add() {
               disabled={loading}
               type="button"
               onClick={(e) => {
-                e.preventDefault();
                 dispatch({ type: "add", actionName: "addExtractType" });
               }}
             >
@@ -430,13 +430,14 @@ function Add() {
             return (
               <div
                 key={crypto.randomUUID()}
-                className="w-full rounded-lg bg-blue-50 p-4"
+                className="w-full rounded bg-background p-4 text-foreground"
               >
-                <div className="flex items-center justify-between p-2 ">
+                {/* Header */}
+                <div className="mb-6 flex items-center justify-between border-b-4 border-foreground p-2">
                   <p className="text-lg text-secondary-foreground">
-                    <span className="mr-4 text-xl font-medium">
+                    <span className="mr-2 text-xl font-medium">
                       {item.result.length}
-                    </span>{" "}
+                    </span>
                     results
                   </p>
                   <Button variant="default" type="button" onClick={() => {}}>
@@ -496,7 +497,7 @@ function Add() {
       </div>
       <div>
         {totalPages > 1 && (
-          <Pagination>
+          <Pagination className="my-4 text-foreground">
             <PaginationContent className="ml-auto mr-2">
               <PaginationItem>
                 <PaginationPrevious onClick={() => setPrevPage()} />

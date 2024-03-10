@@ -12,25 +12,24 @@ function Navbar({ children }: Props) {
     <div className="group relative z-10 mx-auto flex max-w-screen-2xl  items-center  justify-between  rounded-b  bg-background px-20  py-4 text-foreground ">
       {/* logo */}
       <div className="">
-        <Link
-          href={"/"}
-          className="text-gradient dark:bounce flex gap-4 text-4xl "
-        >
-          <Image
-            src="/logo_black.svg"
-            alt="logo"
-            width={50}
-            height={50}
-            className="dark:hidden"
-          />
-          <Image
-            src="/logo_white.svg"
-            alt="logo"
-            width={50}
-            color="red"
-            className="hidden dark:block"
-            height={50}
-          />{" "}
+        <Link href={"/"} className="text-gradient  flex gap-4 text-5xl">
+          <div className="logo flex items-center justify-center">
+            <Image
+              src="/logo_black.svg"
+              alt="logo"
+              width={50}
+              height={50}
+              className="dark:hidden"
+            />
+            <Image
+              src="/logo_white.svg"
+              alt="logo"
+              width={50}
+              color="red"
+              className="hidden dark:block"
+              height={50}
+            />
+          </div>{" "}
           Scrappify
         </Link>
       </div>

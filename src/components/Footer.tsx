@@ -3,7 +3,7 @@ import Link from "next/link";
 
 function Footer() {
   return (
-    <footer className="mx-auto flex max-w-screen-2xl justify-center bg-background p-4 text-foreground  ">
+    <footer className="mx-auto flex max-w-screen-2xl justify-center  rounded-t bg-background p-4 text-foreground  ">
       <div className="flex flex-col items-center gap-10 sm:flex-row">
         <p className="ml-auto w-fit">Made with ❤️ </p>
         <div className="group flex items-center">
