@@ -33,7 +33,7 @@ async function Home() {
           <p>Tailored to your business needs:</p>
           <div className="mt-8 ">
             <Link
-              className="border-lg mt-10 rounded bg-primary p-2 text-xl text-foreground text-white "
+              className="border-lg mt-10 rounded bg-secondary p-2 text-xl text-secondary-foreground "
               href={"/add"}
             >
               Try it out right now

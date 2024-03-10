@@ -26,12 +26,11 @@ export default function RootLayout({
       <body className={`${source_sans_3.className} `}>
         <ThemeProvider>
           <Navbar />
-          <main className="mx-auto min-h-[calc(100vh-128px)] max-w-screen-xl">
+          <main className="mx-auto min-h-[calc(100vh-141px)] max-w-screen-xl">
             {children}
           </main>
-          {/* <Footer /> */}
+          <Footer />
         </ThemeProvider>
-        <Footer />
       </body>
     </html>
   );

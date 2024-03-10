@@ -9,7 +9,7 @@ type Props = {
 
 function Navbar({ children }: Props) {
   return (
-    <div className="group mx-auto flex max-w-screen-2xl  items-center  justify-between  rounded-b  bg-background px-10 py-4 text-foreground  ">
+    <div className="group relative z-10 mx-auto flex max-w-screen-2xl  items-center  justify-between  rounded-b  bg-background px-20  py-4 text-foreground ">
       {/* logo */}
       <div className="">
         <Link

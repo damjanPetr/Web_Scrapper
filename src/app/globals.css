@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 195 0% 100%;
+    --background: 0 0% 96%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -69,6 +69,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
     .bg-destructive {
       &:hover {
         filter: hue-rotate(-20deg);
@@ -82,15 +83,40 @@
   }
   body {
     @apply text-foreground;
-    background-image: linear-gradient(0deg, #e1ebf6 0%, #e0c3fc 100%);
+    /* background: linear-gradient(to top, #3f2b96, #a8c0ff); */
+    background-image: url("https://www.transparenttextures.com/patterns/arabesque.png");
+    position: relative;
+  }
+  &:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to top,
+      hsla(251, 55%, 38%, 0.866),
+      hsla(223, 100%, 83%, 0.478)
+    );
+  }
+  &.dark {
+    &:after {
+      background-color: hsla(90, 28%, 60%, 0.696);
+    }
   }
 }
 
 .theme.dark {
-  background-image: linear-gradient(0deg, #273441 0%, #e0c3fc 100%);
+  background-image: linear-gradient(to top, #273441 0%, #e0c3fc 100%);
 }
 
 @layer components {
+  .bg-background {
+    background-color: #343d57;
+    background-image: url("https://www.transparenttextures.com/patterns/clean-gray-paper.png");
+  }
   .text-gradient {
     --color1: #00a651;
     --color2: #72c6ef;
@@ -118,7 +144,7 @@
   .window_popup {
     position: absolute;
     width: 100%;
-    z-index: -1;
+    z-index: 0;
     left: 0;
     top: 0;
     display: flex;
@@ -180,34 +206,33 @@
         }
       }
     }
-  }
-
-  .active {
-    .left_side {
-      .item {
-        &:nth-child(1) {
-          transform: rotate(130deg) translateX(-10px);
-        }
-        &:nth-child(2) {
-          transform: rotate(120deg) translateX(-20px);
-        }
-        &:nth-child(3) {
-          transform: rotate(110deg) translateX(-30px);
-          width: 400px;
+    &.active {
+      .left_side {
+        .item {
+          &:nth-child(1) {
+            transform: rotate(130deg) translateX(-10px);
+          }
+          &:nth-child(2) {
+            transform: rotate(120deg) translateX(-20px);
+          }
+          &:nth-child(3) {
+            transform: rotate(110deg) translateX(-30px);
+            width: 400px;
+          }
         }
       }
-    }
-    .right_side {
-      .item {
-        &:nth-child(1) {
-          transform: rotate(-130deg) translateX(10px);
-        }
-        &:nth-child(2) {
-          transform: rotate(-120deg) translateX(20px);
-        }
-        &:nth-child(3) {
-          transform: rotate(-110deg) translateX(30px);
-          width: 400px;
+      .right_side {
+        .item {
+          &:nth-child(1) {
+            transform: rotate(-130deg) translateX(10px);
+          }
+          &:nth-child(2) {
+            transform: rotate(-120deg) translateX(20px);
+          }
+          &:nth-child(3) {
+            transform: rotate(-110deg) translateX(30px);
+            width: 400px;
+          }
         }
       }
     }
@@ -274,10 +299,7 @@
       --test_color: hsl(128, 100%, 20%);
     }
   }
-}
-
-.dark {
-  & .bubble {
+  .dark & {
     /* filter: invert(1); */
     &.active {
       background-color: hsl(128, 40%, 50%);
