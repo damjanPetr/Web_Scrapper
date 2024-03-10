@@ -34,11 +34,11 @@ function Navbar({ children }: Props) {
         </Link>
       </div>
       <nav className="flex items-center gap-8">
-        <ul className="flex gap-10 text-xl">
+        {/* <ul className="flex gap-10 text-xl">
           <li>
             <Link href={"/add"}>Add</Link>
           </li>
-        </ul>
+        </ul> */}
         <ThemeToggle />
       </nav>
     </div>

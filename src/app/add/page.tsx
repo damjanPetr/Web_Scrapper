@@ -11,7 +11,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -25,12 +24,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { themeContex } from "@/contex/ThemeContex";
 import ExtractElementInput from "@/src/components/ExtractElementInput";
 import { Icon } from "@iconify-icon/react";
 import {
   SyntheticEvent,
-  useContext,
   useEffect,
   useId,
   useReducer,
@@ -38,6 +35,20 @@ import {
   useState,
 } from "react";
 
+const selectValues = [
+  {
+    name: "Link Url",
+    value: "href",
+  },
+  {
+    name: "Text",
+    value: "textContent",
+  },
+  {
+    name: "Src Attribute",
+    value: "src",
+  },
+];
 export type reducerAction =
   | {
       type: "removeAll";
@@ -189,7 +200,7 @@ function Add() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative ">
       {/* Down Button */}
       {error.error && (
         <p className="absolute top-full w-full rounded bg-destructive p-2 text-destructive-foreground">
@@ -211,7 +222,7 @@ function Add() {
           icon="mdi:arrow-up"
           width={30}
           height={30}
-          className="fixed bottom-6 right-6 rounded bg-violet-400 p-4 text-white "
+          className="fixed bottom-6 right-6 rounded bg-violet-400 p-4 text-white dark:bg-violet-100 dark:text-black "
         />
       </button>
       {/* Form for initial selector input */}
@@ -313,8 +324,13 @@ function Add() {
                   <SelectValue placeholder="Link Url" />
                 </SelectTrigger>
                 <SelectContent className="text-lg font-semibold ">
-                  <SelectItem value="href">Link Url</SelectItem>
-                  <SelectItem value="textContent">Text Content</SelectItem>
+                  {selectValues.map((option, index) => {
+                    return (
+                      <SelectItem key={index} value={option.value}>
+                        {option.name}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             )}
@@ -391,8 +407,8 @@ function Add() {
               </Button>
             )}{" "}
             <Button
-              variant="default"
-              className="bg-cyan-700"
+              variant="secondary"
+              className="   "
               disabled={loading}
               type="button"
               onClick={(e) => {
@@ -408,6 +424,7 @@ function Add() {
             actions.map((item) => {
               return (
                 <ExtractElementInput
+                  selectValues={selectValues}
                   disabled={loading}
                   enabled={item.enabled}
                   dispatch={dispatch}
@@ -516,7 +533,7 @@ function Add() {
                           key={i}
                           className={
                             currentPage === item
-                              ? "bg-secondary/50 font-extrabold"
+                              ? "bg-foreground font-extrabold text-background"
                               : ""
                           }
                           onClick={(e) => {

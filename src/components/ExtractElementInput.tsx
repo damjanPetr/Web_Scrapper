@@ -10,6 +10,13 @@ import {
 import { Icon } from "@iconify-icon/react";
 import { useEffect, useId, useState } from "react";
 import { actionsType, reducerAction } from "../app/add/page";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type Props = {
   state: actionsType[];
@@ -17,6 +24,7 @@ export type Props = {
   dispatch: (arg: reducerAction) => void;
   disabled: boolean;
   enabled: boolean;
+  selectValues: { name: string; value: string }[];
 };
 
 const initialState = {
@@ -31,6 +39,7 @@ function ExtractElementInput({
   state,
   disabled,
   enabled,
+  selectValues,
 }: Props) {
   const id = useId();
 
@@ -47,7 +56,7 @@ function ExtractElementInput({
   return (
     <fieldset
       disabled={disabled}
-      className={`relative   rounded p-2 transition-colors ${enabled && "bg-green-400/50 dark:bg-green-800/50"}`}
+      className={`relative  rounded p-2 text-foreground transition-colors ${enabled && "bg-green-400/50 dark:bg-green-800/50"}`}
     >
       {enabled && (
         <div className="absolute  right-0 top-0   rounded-bl border-b-2 border-l-2  bg-green-500/60 p-2 font-bold text-white ">
@@ -120,7 +129,7 @@ function ExtractElementInput({
           <Label htmlFor={id + `type`} className="text-lg text-white">
             Type
           </Label>
-          <select
+          {/* <select
             onChange={(e) => {
               console.log(data);
               setData({ ...data, type: e.target.value });
@@ -129,9 +138,34 @@ function ExtractElementInput({
             id={id + `type`}
             className="block rounded px-3 py-2  font-semibold  "
           >
-            <option value="href">Link Url</option>
-            <option value="textContent">Text Content</option>
-          </select>
+            {selectValues.map((option, index) => {
+              return (
+                <option key={index} value={option.value}>
+                  {option.name}
+                </option>
+              );
+            })}
+          </select> */}
+          <Select
+            name="selectorType"
+            defaultValue="href"
+            onValueChange={(e) => {
+              setData({ ...data, type: e });
+            }}
+          >
+            <SelectTrigger className="text-lg font-semibold text-foreground sm:w-[280px]">
+              <SelectValue placeholder="Link Url" />
+            </SelectTrigger>
+            <SelectContent className="text-lg font-semibold ">
+              {selectValues.map((option, index) => {
+                return (
+                  <SelectItem key={index} value={option.value}>
+                    {option.name}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* filter */}
@@ -179,7 +213,7 @@ function ExtractElementInput({
             tabIndex={0}
             width={24}
             height={24}
-            className={`bubble  bg-approved rounded-md  p-0.5   ${enabled ? "active" : ""}`}
+            className={`bubble  rounded-md bg-approved  p-0.5   ${enabled ? "active" : ""}`}
             onClick={() => {
               // setEnabled(!enabled);
               dispatch({ type: "toggle", uuid: uuid });

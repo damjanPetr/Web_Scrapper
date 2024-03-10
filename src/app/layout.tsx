@@ -26,7 +26,7 @@ export default function RootLayout({
       <body className={`${source_sans_3.className} `}>
         <ThemeProvider>
           <Navbar />
-          <main className="mx-auto min-h-[calc(100vh-141px)] max-w-screen-xl">
+          <main className="mx-auto min-h-[calc(100vh-141px)] max-w-screen-xl p-[0.1px]">
             {children}
           </main>
           <Footer />
