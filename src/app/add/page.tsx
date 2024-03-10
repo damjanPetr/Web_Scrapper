@@ -71,7 +71,7 @@ const initialOptions = {
   selectorName: "",
 };
 
-const itemsPerPage = 10; // Number of items to display per page
+const itemsPerPage = 20; // Number of items to display per page
 
 function Add() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -145,37 +145,43 @@ function Add() {
         method: "POST",
         body: JSON.stringify(outputData),
       });
-      const reader = response.body?.getReader();
+      // const reader = response.body?.getReader();
 
-      while (true) {
-        if (reader) {
-          const { done, value } = await reader?.read();
-          const chunk = new TextDecoder().decode(value);
+      // while (true) {
+      //   if (reader) {
+      //     const { done, value } = await reader?.read();
+      //     const chunk = new TextDecoder().decode(value);
+      //     console.log(chunk);
 
-          if (chunk.startsWith("{")) {
-            const jsonData = JSON.parse(chunk);
-            if (jsonData.error) throw new Error(jsonData.error);
-            if (jsonData.result) {
-              console.log(jsonData);
-              setError({ error: null });
-              setData([jsonData]);
-            }
-          } else {
-            setProgress(parseInt(chunk));
-          }
+      //     if (chunk.startsWith("{")) {
+      //       const jsonData = JSON.parse(chunk);
+      //       if (jsonData.error) throw new Error(jsonData.error);
+      //       if (jsonData.result) {
+      //         console.log(jsonData);
+      //         setError({ error: null });
+      //         setData([jsonData]);
+      //       }
+      //     } else {
+      //       setProgress(parseInt(chunk));
+      //     }
 
-          if (done) {
-            reader.cancel();
-            break;
-          }
-        }
-      }
+      //     if (done) {
+      //       reader.cancel();
+      //       break;
+      // }
+      // }
+      // }
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setData([data]);
+      setError({ error: null });
     } catch (err) {
       if (err instanceof Error) {
+        console.log(err);
         setError({ error: err.message });
       }
     } finally {
-      setProgress(0);
+      // setProgress(0);
       setCurrentPage(1);
       setLoading(false);
       setCancelStream(false);
@@ -312,7 +318,7 @@ function Add() {
           </fieldset>
         </div>
         <div className="!max-sm:mt-2 flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
-          <div className="relative  max-sm:min-w-80 ">
+          <div className="  max-sm:min-w-80 ">
             <div className="flex  flex-wrap justify-between gap-8 max-sm:min-h-20 ">
               <Button
                 variant="default"
@@ -323,16 +329,24 @@ function Add() {
                 Submit
               </Button>
               {loading && (
-                <Button
-                  variant="default"
-                  className="bg-violet-400 "
-                  type="button"
-                  onClick={(e) => {
-                    setCancelStream(true);
-                  }}
-                >
-                  Cancel
-                </Button>
+                <div className="flex items-center justify-between gap-2">
+                  <Button
+                    variant="default"
+                    className="bg-violet-400 "
+                    type="button"
+                    onClick={(e) => {
+                      setCancelStream(true);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Icon
+                    icon={"svg-spinners:wind-toy"}
+                    width={30}
+                    height={30}
+                    className="text-foreground"
+                  />
+                </div>
               )}
               {data.length > 0 && !loading && (
                 <Button
@@ -348,19 +362,13 @@ function Add() {
             </div>
 
             {loading && (
-              <div className="absolute inset-y-0  top-3/4 ml-4 flex items-center justify-center  gap-2 text-white sm:left-full ">
-                <Icon
-                  icon={"svg-spinners:wind-toy"}
-                  width={30}
-                  height={30}
-                  className=""
-                />
-                <Progress
+              <div className=" ml-4   text-white  ">
+                {/* <Progress
                   id="loadingProgress"
                   value={progress}
                   className=" w-28 transition-all"
-                />
-                {progress}%
+                /> */}
+                {/* {progress}% */}
               </div>
             )}
           </div>

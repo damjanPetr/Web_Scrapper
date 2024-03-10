@@ -1,9 +1,8 @@
 import { Metadata } from "next";
 
+import Link from "next/link";
 import PopupBars from "../components/PopupBars";
 import db from "../database/Database";
-import Link from "next/link";
-import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Web Scrapper Homepage",
@@ -24,7 +23,7 @@ async function Home() {
 
   return (
     <div className="overflow-hidden rounded  p-1 text-foreground ">
-      <div className="hero mt-60  bg-background p-10">
+      <div className="hero mt-60  rounded bg-background p-10">
         <div className="   bg-background p-4 text-foreground">
           <h1 className="text-3xl "> Grab Context Easily</h1>
 
