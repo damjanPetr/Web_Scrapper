@@ -9,7 +9,7 @@ type Props = {
 
 function Navbar({ children }: Props) {
   return (
-    <div className="group relative z-10 mx-auto flex max-w-screen-2xl  items-center  justify-between  rounded-b  bg-background px-20  py-4 text-foreground ">
+    <div className="group relative z-10 mx-auto flex min-h-[90px]  max-w-screen-2xl  items-baseline justify-between  rounded-b  bg-background px-20  py-4 text-foreground ">
       {/* logo */}
       <div className="">
         <Link href={"/"} className="text-gradient  flex gap-4 text-5xl">
@@ -29,8 +29,8 @@ function Navbar({ children }: Props) {
               className="hidden dark:block"
               height={50}
             />
-          </div>{" "}
-          Scrappify
+          </div>
+          Scrapify
         </Link>
       </div>
       <nav className="flex items-center gap-8">

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-
+import Image from "next/image";
 import Link from "next/link";
 import PopupBars from "../components/PopupBars";
 import db from "../database/Database";
@@ -23,7 +23,7 @@ async function Home() {
   });
 
   return (
-    <div className="mt-60 flex  items-center justify-center overflow-hidden rounded p-1 text-foreground ">
+    <div className="mt-[20vh] flex items-center justify-center overflow-hidden rounded text-foreground ">
       <div className="hero   rounded bg-background p-10 ">
         <div className="gear absolute -right-12 -top-12    ">
           <Icon icon="eos-icons:rotating-gear" width={100} height={100} />
@@ -31,26 +31,54 @@ async function Home() {
         <div className="gear absolute -bottom-12 -left-12    ">
           <Icon icon="eos-icons:rotating-gear" width={100} height={100} />
         </div>
-        <div className="   bg-background p-4 text-foreground">
-          <h1 className="text-3xl "> Grab Context Easily</h1>
+        <div className="   bg-background p-4  text-foreground">
+          <div className="text-center">
+            <h1 className="  text-3xl font-extrabold">Grab Context Easily</h1>
+            <h2 className="mt-4 text-2xl font-medium text-popover-foreground">
+              Empower Your Data
+            </h2>
+          </div>
 
-          <h2 className="text-1xl mt-4">Empower Your Data</h2>
-          <p className="mt-10">Unlock the full potential of the internet.</p>
-          <p>Reliable, structured data:</p>
-          <p>Tailored to your business needs:</p>
+          <ul className="mt-8 list-inside list-disc space-y-10 text-lg marker:-ml-4 ">
+            <li className="">Unlock the full potential of the internet.</li>
+            <li>Reliable, structured data.</li>
+            <li>Tailored to your business needs.</li>
+            <li>Easy to use</li>
+          </ul>
         </div>
-        <div className="bg-background p-4 ">
+        <div className="right rounded bg-white p-4 ring dark:bg-black">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-10 sm:flex-nowrap">
+            <Image
+              src="/undraw_data_extraction_re_0rd3.svg"
+              alt="hero"
+              width={150}
+              height={120}
+            />
+            <Image
+              src="/undraw_website_builder_re_ii6e.svg"
+              alt="hero"
+              width={150}
+              height={120}
+            />
+            <Image
+              src="/undraw_version_control_re_mg66.svg"
+              alt="hero"
+              width={150}
+              height={120}
+            />
+          </div>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia ullam
           tempora eum alias doloremque molestiae distinctio quasi eveniet
           inventore illo. Lorem ipsum dolor sit amet consectetur adipisicing
           elit. Necessitatibus itaque sed molestias optio, molestiae fugit quos
           nemo repudiandae distinctio reprehenderit.
-          <div className="mt-8 ">
+          <div className="mt-8 flex items-center justify-center">
             <Link
-              className="border-lg mt-10 rounded bg-secondary p-2 text-xl text-secondary-foreground "
+              className="border-lg  rounded bg-blue-400 p-4 text-2xl text-white dark:bg-blue-700  "
               href={"/add"}
             >
-              Try it out right now
+              Grab Data{" "}
+              <span className=" underline underline-offset-2 ">NOW</span>
             </Link>
           </div>
         </div>

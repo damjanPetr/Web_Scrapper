@@ -200,7 +200,7 @@ function Add() {
   }
 
   return (
-    <div className="relative ">
+    <div className="relative  mt-28">
       {/* Down Button */}
       {error.error && (
         <p className="absolute top-full w-full rounded bg-destructive p-2 text-destructive-foreground">
@@ -240,6 +240,7 @@ function Add() {
             </Label>
             <Input
               type="text"
+              autoFocus
               name="title"
               className="text-lg font-medium"
               required
