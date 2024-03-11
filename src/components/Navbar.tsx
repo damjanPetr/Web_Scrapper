@@ -1,4 +1,5 @@
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
+import Image from "next/image";
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
 
@@ -7,24 +8,37 @@ type Props = {
 };
 
 function Navbar({ children }: Props) {
-  const link = process.env.NEXT_PUBLIC_BASE_URL;
-  const meh = process.env.PUPPETEER_CACHE_DIR;
-  const ee = process.env.DATABASE_URL;
-
   return (
-    <div className="mx-auto mb-20 flex max-w-screen-2xl items-center  justify-between  bg-background  px-10  py-4 text-foreground   ">
+    <div className="group relative z-10 mx-auto flex min-h-[90px]  max-w-screen-2xl  items-baseline justify-between  rounded-b  bg-background px-20  py-4 text-foreground ">
       {/* logo */}
-      <div className="text-2xl font-bold ">
-        <Link href={"/"} className="text-gradient ">
-          {link} {meh} {ee}link Web Scrapper
+      <div className="">
+        <Link href={"/"} className="text-gradient  flex gap-4 text-5xl">
+          <div className="logo flex items-center justify-center">
+            <Image
+              src="/logo_black.svg"
+              alt="logo"
+              width={50}
+              height={50}
+              className="dark:hidden"
+            />
+            <Image
+              src="/logo_white.svg"
+              alt="logo"
+              width={50}
+              color="red"
+              className="hidden dark:block"
+              height={50}
+            />
+          </div>
+          Scrapify
         </Link>
       </div>
       <nav className="flex items-center gap-8">
-        <ul className="flex gap-10 text-xl">
+        {/* <ul className="flex gap-10 text-xl">
           <li>
             <Link href={"/add"}>Add</Link>
           </li>
-        </ul>
+        </ul> */}
         <ThemeToggle />
       </nav>
     </div>

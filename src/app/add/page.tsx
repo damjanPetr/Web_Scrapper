@@ -11,7 +11,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -25,12 +24,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { themeContex } from "@/contex/ThemeContex";
 import ExtractElementInput from "@/src/components/ExtractElementInput";
 import { Icon } from "@iconify-icon/react";
 import {
   SyntheticEvent,
-  useContext,
   useEffect,
   useId,
   useReducer,
@@ -38,6 +35,20 @@ import {
   useState,
 } from "react";
 
+const selectValues = [
+  {
+    name: "Link Url",
+    value: "href",
+  },
+  {
+    name: "Text",
+    value: "textContent",
+  },
+  {
+    name: "Src Attribute",
+    value: "src",
+  },
+];
 export type reducerAction =
   | {
       type: "removeAll";
@@ -71,7 +82,7 @@ const initialOptions = {
   selectorName: "",
 };
 
-const itemsPerPage = 10; // Number of items to display per page
+const itemsPerPage = 20; // Number of items to display per page
 
 function Add() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -145,48 +156,57 @@ function Add() {
         method: "POST",
         body: JSON.stringify(outputData),
       });
-      const reader = response.body?.getReader();
+      // const reader = response.body?.getReader();
 
-      while (true) {
-        if (reader) {
-          const { done, value } = await reader?.read();
-          const chunk = new TextDecoder().decode(value);
+      // while (true) {
+      //   if (reader) {
+      //     const { done, value } = await reader?.read();
+      //     const chunk = new TextDecoder().decode(value);
+      //     console.log(chunk);
 
-          if (chunk.startsWith("{")) {
-            const jsonData = JSON.parse(chunk);
-            if (jsonData.error) throw new Error(jsonData.error);
-            if (jsonData.result) {
-              console.log(jsonData);
-              setError({ error: null });
-              setData([jsonData]);
-            }
-          } else {
-            setProgress(parseInt(chunk));
-          }
+      //     if (chunk.startsWith("{")) {
+      //       const jsonData = JSON.parse(chunk);
+      //       if (jsonData.error) throw new Error(jsonData.error);
+      //       if (jsonData.result) {
+      //         console.log(jsonData);
+      //         setError({ error: null });
+      //         setData([jsonData]);
+      //       }
+      //     } else {
+      //       setProgress(parseInt(chunk));
+      //     }
 
-          if (done) {
-            reader.cancel();
-            break;
-          }
-        }
-      }
+      //     if (done) {
+      //       reader.cancel();
+      //       break;
+      // }
+      // }
+      // }
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setData([data]);
+      setError({ error: null });
     } catch (err) {
       if (err instanceof Error) {
+        console.log(err);
         setError({ error: err.message });
       }
     } finally {
-      setProgress(0);
+      // setProgress(0);
       setCurrentPage(1);
       setLoading(false);
       setCancelStream(false);
     }
   }
-  const play = useContext(themeContex);
 
   return (
-    <div>
+    <div className="relative  mt-28">
       {/* Down Button */}
-      {error.error && <p className="text-red-500">{error.error}</p>}
+      {error.error && (
+        <p className="absolute top-full w-full rounded bg-destructive p-2 text-destructive-foreground">
+          {error.error}
+        </p>
+      )}
       <button
         ref={downBtn}
         type="button"
@@ -202,13 +222,13 @@ function Add() {
           icon="mdi:arrow-up"
           width={30}
           height={30}
-          className="fixed bottom-6 right-6 rounded bg-violet-400 p-4 text-white "
+          className="fixed bottom-6 right-6 rounded bg-violet-400 p-4 text-white dark:bg-violet-100 dark:text-black "
         />
       </button>
       {/* Form for initial selector input */}
       <form action="" onSubmit={handleSubmit} className="mb-10 " id="addForm">
         <fieldset
-          className={`space-y-4 rounded border text-foreground p-4${loading ? " bg-muted" : " "}`}
+          className={`space-y-4 rounded border bg-background text-foreground p-4${loading ? " bg-muted" : " "}`}
           disabled={loading}
         >
           <h2 itemID={"play"} className="  p-2 text-2xl font-bold">
@@ -220,6 +240,7 @@ function Add() {
             </Label>
             <Input
               type="text"
+              autoFocus
               name="title"
               className="text-lg font-medium"
               required
@@ -245,7 +266,7 @@ function Add() {
           </div>
         </fieldset>
 
-        <div className=" space-y-4 rounded   p-4 max-sm:min-h-[310px]">
+        <div className=" mt-10 space-y-4  rounded bg-background p-4 text-foreground max-sm:min-h-[310px]">
           <legend className="mb-8 border-b  p-2 text-2xl font-semibold text-foreground  ">
             Select Scraping Items
             <TooltipProvider delayDuration={200}>
@@ -267,7 +288,7 @@ function Add() {
             </TooltipProvider>
           </legend>
           <fieldset
-            className={`flex flex-col gap-8 rounded  sm:flex-row ${loading ? " bg-slate-100" : ""}`}
+            className={`mt-10 flex flex-col gap-8 rounded  sm:flex-row ${loading ? " " : ""}`}
             disabled={loading}
           >
             <Input
@@ -304,15 +325,20 @@ function Add() {
                   <SelectValue placeholder="Link Url" />
                 </SelectTrigger>
                 <SelectContent className="text-lg font-semibold ">
-                  <SelectItem value="href">Link Url</SelectItem>
-                  <SelectItem value="textContent">Text Content</SelectItem>
+                  {selectValues.map((option, index) => {
+                    return (
+                      <SelectItem key={index} value={option.value}>
+                        {option.name}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             )}
           </fieldset>
         </div>
         <div className="!max-sm:mt-2 flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
-          <div className="relative  max-sm:min-w-80 ">
+          <div className="  max-sm:min-w-80 ">
             <div className="flex  flex-wrap justify-between gap-8 max-sm:min-h-20 ">
               <Button
                 variant="default"
@@ -323,21 +349,29 @@ function Add() {
                 Submit
               </Button>
               {loading && (
-                <Button
-                  variant="default"
-                  className="bg-violet-400 "
-                  type="button"
-                  onClick={(e) => {
-                    setCancelStream(true);
-                  }}
-                >
-                  Cancel
-                </Button>
+                <div className="flex items-center justify-between gap-2">
+                  <Button
+                    variant="default"
+                    className="bg-violet-400 "
+                    type="button"
+                    onClick={(e) => {
+                      setCancelStream(true);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Icon
+                    icon={"svg-spinners:wind-toy"}
+                    width={30}
+                    height={30}
+                    className="text-foreground"
+                  />
+                </div>
               )}
               {data.length > 0 && !loading && (
                 <Button
                   variant="default"
-                  className="bg-red-400 hover:bg-red-600"
+                  className=" bg-destructive text-destructive-foreground "
                   disabled={loading}
                   type="submit"
                   onClick={() => setData([])}
@@ -348,19 +382,13 @@ function Add() {
             </div>
 
             {loading && (
-              <div className="absolute inset-y-0  top-3/4 ml-4 flex items-center justify-center  gap-2 text-white sm:left-full ">
-                <Icon
-                  icon={"svg-spinners:wind-toy"}
-                  width={30}
-                  height={30}
-                  className=""
-                />
-                <Progress
+              <div className=" ml-4   text-white  ">
+                {/* <Progress
                   id="loadingProgress"
                   value={progress}
                   className=" w-28 transition-all"
-                />
-                {progress}%
+                /> */}
+                {/* {progress}% */}
               </div>
             )}
           </div>
@@ -369,12 +397,10 @@ function Add() {
             {actions.length > 0 && (
               <Button
                 variant="default"
-                className="bg-red-400 "
+                className=" bg-destructive text-destructive-foreground "
                 disabled={loading}
                 type="submit"
                 onClick={(e) => {
-                  e.preventDefault();
-
                   dispatch({ type: "removeAll" });
                 }}
               >
@@ -382,12 +408,11 @@ function Add() {
               </Button>
             )}{" "}
             <Button
-              variant="default"
-              className="bg-cyan-700"
+              variant="secondary"
+              className="   "
               disabled={loading}
               type="button"
               onClick={(e) => {
-                e.preventDefault();
                 dispatch({ type: "add", actionName: "addExtractType" });
               }}
             >
@@ -400,6 +425,7 @@ function Add() {
             actions.map((item) => {
               return (
                 <ExtractElementInput
+                  selectValues={selectValues}
                   disabled={loading}
                   enabled={item.enabled}
                   dispatch={dispatch}
@@ -422,13 +448,14 @@ function Add() {
             return (
               <div
                 key={crypto.randomUUID()}
-                className="w-full rounded-lg bg-blue-50 p-4"
+                className="w-full rounded bg-background p-4 text-foreground"
               >
-                <div className="flex items-center justify-between p-2 ">
+                {/* Header */}
+                <div className="mb-6 flex items-center justify-between border-b-4 border-foreground p-2">
                   <p className="text-lg text-secondary-foreground">
-                    <span className="mr-4 text-xl font-medium">
+                    <span className="mr-2 text-xl font-medium">
                       {item.result.length}
-                    </span>{" "}
+                    </span>
                     results
                   </p>
                   <Button variant="default" type="button" onClick={() => {}}>
@@ -488,7 +515,7 @@ function Add() {
       </div>
       <div>
         {totalPages > 1 && (
-          <Pagination>
+          <Pagination className="my-4 text-foreground">
             <PaginationContent className="ml-auto mr-2">
               <PaginationItem>
                 <PaginationPrevious onClick={() => setPrevPage()} />
@@ -507,7 +534,7 @@ function Add() {
                           key={i}
                           className={
                             currentPage === item
-                              ? "bg-secondary/50 font-extrabold"
+                              ? "bg-foreground font-extrabold text-background"
                               : ""
                           }
                           onClick={(e) => {

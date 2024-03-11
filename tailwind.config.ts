@@ -17,6 +17,10 @@ const config = {
         "2xl": "1400px",
       },
     },
+    fontFamily: {
+      sans: ["var(--font-inter)"],
+      serif: ["var(--font-source-sans-3)"],
+    },
     extend: {
       colors: {
         border: "hsl(var(--border))",
@@ -44,6 +48,10 @@ const config = {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        approved: {
+          DEFAULT: "hsl(var(--approved))",
+          foreground: "hsl(var(--approved-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -54,9 +62,10 @@ const config = {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
+        DEFAULT: "var(--radius)",
         sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 2px)",
+        lg: "var(--radius + 2px)",
       },
       keyframes: {
         "accordion-down": {

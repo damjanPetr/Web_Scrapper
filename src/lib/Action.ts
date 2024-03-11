@@ -43,7 +43,6 @@ export class addTitleAction extends Action {
     this.state.info.title = this.title;
   }
 }
-
 export class loadBrowserAction extends Action {
   constructor() {
     super();
@@ -52,7 +51,6 @@ export class loadBrowserAction extends Action {
     this.state.browser = await puppeteer.launch({
       headless: "shell",
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
-
       // executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
     });
   }
@@ -66,7 +64,10 @@ export class openNewPageAction extends Action {
   async execute() {
     if (this.state.browser?.connected) {
       const page = await this.state.browser.newPage();
-      const test = await page.goto(this.url);
+      const test = await page.goto(this.url, {
+        waitUntil: "domcontentloaded",
+        timeout: 60000,
+      });
       if (test == null) throw new Error("page is null");
       this.state.page = page;
       this.state.info.link = this.url;
@@ -357,13 +358,13 @@ export class printResultAction extends Action {
   async execute() {
     const info = [this.state.info.title, this.state.info.link];
     const input = this.state.result;
-    console.log(input);
+    // console.log(input);
     stringify(
       input,
       // { header: true, columns: [...Object.keys(input[0])] },
       (err, csv) => {
         if (err) throw err;
-        writeFileSync("./result.csv", csv + "\r");
+        writeFileSync("./testData/result.csv", csv + "\r");
       },
     );
   }

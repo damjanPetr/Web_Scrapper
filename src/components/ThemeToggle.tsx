@@ -7,7 +7,7 @@ function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="toogle">
+    <button className="toogle" tabIndex={0} type="button">
       {theme === "light" && (
         <Icon
           className="dark:hidden "
@@ -26,7 +26,7 @@ function ThemeToggle() {
           onClick={() => setTheme("light")}
         />
       )}
-    </div>
+    </button>
   );
 }
 export default ThemeToggle;

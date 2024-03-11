@@ -129,7 +129,7 @@ export class Invoker implements addToDatabase {
             },
           });
         });
-        console.log(parameters);
+        // console.log(parameters);
       });
 
       console.log("added to database");

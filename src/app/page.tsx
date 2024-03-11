@@ -1,5 +1,9 @@
 import { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import PopupBars from "../components/PopupBars";
 import db from "../database/Database";
+import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 
 export const metadata: Metadata = {
   title: "Web Scrapper Homepage",
@@ -19,72 +23,68 @@ async function Home() {
   });
 
   return (
-    <div className="">
-      <div className="">
-        <article className="">
-          <section className="space-y-4">
-            {instance.map((instanceItem) => {
-              return (
-                <div
-                  key={instanceItem.id}
-                  className="w-full rounded-lg bg-blue-50 p-4 "
-                >
-                  <div className="space-y-4 p-4">
-                    <h1 className="text-2xl">
-                      <span className="font-semibold">Title:</span>{" "}
-                      {instanceItem.title}
-                    </h1>
-                    <h1 className="text-2xl">
-                      <span className="font-semibold">Link: </span>{" "}
-                      {instanceItem.url}
-                    </h1>
-                  </div>
-                  <div className="bg-red-200">
-                    <h2 className="bg-fuchsia-300  p-2 text-xl font-bold text-gray-700 ">
-                      Actions
-                    </h2>
-                    <div className="">
-                      {instanceItem.actions.map((action) => {
-                        return (
-                          <div key={action.id} className="grid grid-cols-2">
-                            <p>{action.action}</p>
-                            <div className="basis-1/2">
-                              <h3 className="bg-gray-50 text-lg font-bold">
-                                Parameters
-                              </h3>
-                              <div className="flex items-center gap-4  p-4">
-                                {action.parameters.map((parameter) => {
-                                  return (
-                                    <div className="" key={parameter.id}>
-                                      <div className="">{parameter.value}</div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <h2 className="  bg-fuchsia-700 p-2 text-xl font-bold text-white ">
-                    Results
-                  </h2>
-                  <div className="">
-                    {instanceItem.results.map((result) => {
-                      return (
-                        <p className="" key={result.id}>
-                          {JSON.parse(result.body).toString()}
-                        </p>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </section>
-        </article>
+    <div className="mt-[20vh] flex items-center justify-center overflow-hidden rounded text-foreground ">
+      <div className="hero   rounded bg-background p-10 ">
+        <div className="gear absolute -right-12 -top-12    ">
+          <Icon icon="eos-icons:rotating-gear" width={100} height={100} />
+        </div>
+        <div className="gear absolute -bottom-12 -left-12    ">
+          <Icon icon="eos-icons:rotating-gear" width={100} height={100} />
+        </div>
+        <div className="   bg-background p-4  text-foreground">
+          <div className="text-center">
+            <h1 className="  text-3xl font-extrabold">Grab Context Easily</h1>
+            <h2 className="mt-4 text-2xl font-medium text-popover-foreground">
+              Empower Your Data
+            </h2>
+          </div>
+
+          <ul className="mt-8 list-inside list-disc space-y-10 text-lg marker:-ml-4 ">
+            <li className="">Unlock the full potential of the internet.</li>
+            <li>Reliable, structured data.</li>
+            <li>Tailored to your business needs.</li>
+            <li>Easy to use</li>
+          </ul>
+        </div>
+        <div className="right rounded bg-white p-4 ring dark:bg-black">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-10 sm:flex-nowrap">
+            <Image
+              src="/undraw_data_extraction_re_0rd3.svg"
+              alt="hero"
+              width={150}
+              height={120}
+            />
+            <Image
+              src="/undraw_website_builder_re_ii6e.svg"
+              alt="hero"
+              width={150}
+              height={120}
+            />
+            <Image
+              src="/undraw_version_control_re_mg66.svg"
+              alt="hero"
+              width={150}
+              height={120}
+            />
+          </div>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia ullam
+          tempora eum alias doloremque molestiae distinctio quasi eveniet
+          inventore illo. Lorem ipsum dolor sit amet consectetur adipisicing
+          elit. Necessitatibus itaque sed molestias optio, molestiae fugit quos
+          nemo repudiandae distinctio reprehenderit.
+          <div className="mt-8 flex items-center justify-center">
+            <Link
+              className="border-lg  rounded bg-blue-400 p-4 text-2xl text-white dark:bg-blue-700  "
+              href={"/add"}
+            >
+              Grab Data{" "}
+              <span className=" underline underline-offset-2 ">NOW</span>
+            </Link>
+          </div>
+        </div>
       </div>
+
+      <PopupBars />
     </div>
   );
 }

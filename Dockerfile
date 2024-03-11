@@ -34,12 +34,9 @@ COPY --link . .
 # Build application
 RUN npm run build
 
-
-RUN npx puppeteer browsers install chrome-headless-shell
-RUN npx puppeteer browsers install chrome
-
 # Remove development dependencies
 RUN npm prune --omit=dev
+
 
 # Final stage for app image
 FROM base
@@ -61,8 +58,6 @@ ENTRYPOINT [ "/app/docker-entrypoint.js" ]
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-ENV DATABASE_URL="file:///data/sqlite.db" 
-# PUPPETEER_CACHE_DIR='.cache/puppeteer' \
-# NEXT_PUBLIC_BASE_URL="https://next-scrapper.fly.dev/"
-# PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium"
+ENV DATABASE_URL="file:///data/sqlite.db" \
+    PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium"
 CMD [ "npm", "run", "start" ]
